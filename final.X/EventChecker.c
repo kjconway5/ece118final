@@ -31,15 +31,13 @@
 #include "ES_Events.h"
 #include "serial.h"
 #include "AD.h"
-#include "roach.h"
-#include "RoachFSM.h"
+#include "sensormotor.h"
+#include "BotHSM.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define BATTERY_DISCONNECT_THRESHOLD 175
-#define LIGHT_THRESHOLD 550
-#define DARK_THRESHOLD 700
+#define TAPE_THRESHOLD 900
 
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
@@ -113,27 +111,41 @@ uint8_t TemplateCheckBattery(void) {
     return (returnVal);
 }
 */
-
-//Test event checker for light sensor
  
-uint8_t LightEventChecker(void) {
-    static ES_EventTyp_t lastEvent = LIGHT_EVENT;
+uint8_t TapeEventChecker(void) {
+    static ES_EventTyp_t lastEvent = NO_TAPE;
     ES_EventTyp_t curEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    unsigned int lightLevel = Roach_LightLevel();
+    unsigned int l_temp = ReadLeftTape();
+    unsigned int c_temp = ReadCenterTape();
+    unsigned int r_temp = ReadRightTape();
     
-    if (lightLevel > DARK_THRESHOLD) {
-        curEvent = DARK_EVENT;
-    } else if (lightLevel < LIGHT_THRESHOLD) {
-        curEvent = LIGHT_EVENT;
+    uint8_t l = l_temp > TAPE_THRESHOLD;
+    uint8_t c = c_temp > TAPE_THRESHOLD;
+    uint8_t r = r_temp > TAPE_THRESHOLD;
+    
+    uint8_t rawState = (l << 2) | (c << 1) | r;
+    
+    if (l && c && r) {
+        curEvent = ALL_TAPE;
+    } else if (l && c) {
+        curEvent = CL_TAPE;
+    } else if (c && r) {
+        curEvent = CR_TAPE;
+    } else if (c) {
+        curEvent = CENTER_TAPE;
+    } else if (l) {
+        curEvent = LEFT_TAPE;
+    } else if (r) {
+        curEvent = RIGHT_TAPE;
     } else {
-        return FALSE;
+        curEvent = NO_TAPE;
     }
     
     if (curEvent != lastEvent) {
         thisEvent.EventType = curEvent;
-        thisEvent.EventParam = lightLevel;
+        thisEvent.EventParam = rawState;
         returnVal = TRUE;
         lastEvent = curEvent;
     #ifndef EVENTCHECKER_TEST
@@ -146,7 +158,6 @@ uint8_t LightEventChecker(void) {
     return(returnVal);
 }
 
-
 uint8_t BumperEventChecker(void) {
     static ES_EventTyp_t lastEvent = NO_BUMPERS;
     static uint8_t history[4] = {0, 0, 0, 0};
@@ -155,9 +166,9 @@ uint8_t BumperEventChecker(void) {
     uint8_t returnVal = FALSE;
 
     // read and pack raw state into a single byte
-    uint8_t fl = Bot_ReadFrontLeftBumper() == BUMPER_TRIPPED;
-    uint8_t fr = Bot_ReadFrontRightBumper() == BUMPER_TRIPPED;
-    uint8_t rawState = (fl << 3) | (fr << 2) | (rl << 1) | rr;
+    uint8_t l = ReadLeftBumper() == BUMPER_TRIPPED;
+    uint8_t r = ReadRightBumper() == BUMPER_TRIPPED;
+    uint8_t rawState = (l << 1) | r;
 
     // shift history and store raw state, NOT lastEvent
     history[3] = history[2];
@@ -171,25 +182,77 @@ uint8_t BumperEventChecker(void) {
         history[2] == history[3]) {
 
         // unpack from the stable reading
-        fl = (history[0] >> 3) & 1;
-        fr = (history[0] >> 2) & 1;
+        l = (history[0] >> 1) & 1;
+        r = history[0] & 1;
 
-        if (fl && fr && rl && rr) {
+        if (l && r) {
             curEvent = ALL_BUMPERS;
-        } else if (fl && fr) {
-            curEvent = FRONT_BUMPERS;
-        } else if (fl) {
-            curEvent = FRONTLEFT_BUMPER;
-        } else if (fr) {
-            curEvent = FRONTRIGHT_BUMPER;
+        } else if (l) {
+            curEvent = LEFT_BUMPER;
+        } else if (r) {
+            curEvent = RIGHT_BUMPER;
         } else {
-            curEvent = NO_BUMPERS;
+            curEvent = NO_BUMPERS;  
         }
     }
 
     if (curEvent != lastEvent) {
         thisEvent.EventType = curEvent;
-        thisEvent.EventParam = 0;
+        thisEvent.EventParam = rawState;
+        returnVal = TRUE;
+        lastEvent = curEvent;
+#ifndef EVENTCHECKER_TEST
+        PostRoachFSM(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
+    return returnVal;
+}
+
+uint8_t BeaconEventChecker(void) {
+    static ES_EventTyp_t lastEvent = NO_BEACON;
+    ES_EventTyp_t curEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    unsigned int beacon_state = ReadBeacon();
+    
+    if (beacon_state) {
+        curEvent = BEACON_DETECTED;
+    } else {
+        curEvent = NO_BEACON;
+    }
+    
+    if (curEvent != lastEvent) {
+        thisEvent.EventType = curEvent;
+        thisEvent.EventParam = beacon_state;
+        returnVal = TRUE;
+        lastEvent = curEvent;
+#ifndef EVENTCHECKER_TEST
+        PostRoachFSM(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
+    return returnVal;
+}
+
+uint8_t TrackwireEventChecker(void) {
+    static ES_EventTyp_t lastEvent = NO_TRACKWIRE;
+    ES_EventTyp_t curEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    unsigned int trackwire_state = ReadTrackwire();
+    
+    if (trackwire_state) {
+        curEvent = TRACKWIRE_DETECTED;
+    } else {
+        curEvent = NO_TRACKWIRE;
+    }
+    
+    if (curEvent != lastEvent) {
+        thisEvent.EventType = curEvent;
+        thisEvent.EventParam = trackwire_state;
         returnVal = TRUE;
         lastEvent = curEvent;
 #ifndef EVENTCHECKER_TEST

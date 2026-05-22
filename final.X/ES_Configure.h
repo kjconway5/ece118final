@@ -46,14 +46,26 @@ typedef enum {
     /* User-defined events start here */
     LIGHT_EVENT,
     DARK_EVENT,
+
     NO_BUMPERS,
     ALL_BUMPERS,
-    FRONTLEFT_BUMPER,
-    FRONTRIGHT_BUMPER,
-    BACKLEFT_BUMPER,
-    BACKRIGHT_BUMPER,
-    FRONT_BUMPERS,
-    BACK_BUMPERS,
+    LEFT_BUMPER,
+    RIGHT_BUMPER,
+
+    NO_TAPE,
+    CL_TAPE,
+    CR_TAPE,
+    ALL_TAPE,
+    CENTER_TAPE,
+    LEFT_TAPE,
+    RIGHT_TAPE,
+
+    BEACON_DETECTED,
+    NO_BEACON,
+
+    TRACKWIRE_DETECTED,
+    NO_TRACKWIRE,
+
     /* User-defined events end here */
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
@@ -71,14 +83,20 @@ static const char *EventNames[] = {
 	"ES_TIMERSTOPPED",
 	"LIGHT_EVENT",
 	"DARK_EVENT",
+
 	"NO_BUMPERS",
 	"ALL_BUMPERS",
-	"FRONTLEFT_BUMPER",
-	"FRONTRIGHT_BUMPER",
-	"BACKLEFT_BUMPER",
-	"BACKRIGHT_BUMPER",
-	"FRONT_BUMPERS",
-	"BACK_BUMPERS",
+	"LEFT_BUMPER",
+	"RIGHT_BUMPER",
+
+	"NO_TAPE",
+	"CL_TAPE",
+	"CR_TAPE",
+	"ALL_TAPE",
+	"CENTER_TAPE",
+	"LEFT_TAPE",
+	"RIGHT_TAPE",
+
 	"NUMBEROFEVENTS",
 };
 

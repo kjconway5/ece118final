@@ -74,7 +74,7 @@ void SensorMotorInit(void) {
 
 }
 
-int ReadLeftTape(void) {
+int (void) {
     return AD_ReadADPin(LeftTapePin);
 }
 
