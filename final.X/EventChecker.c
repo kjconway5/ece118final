@@ -155,10 +155,8 @@ uint8_t BumperEventChecker(void) {
     uint8_t returnVal = FALSE;
 
     // read and pack raw state into a single byte
-    uint8_t fl = Roach_ReadFrontLeftBumper() == BUMPER_TRIPPED;
-    uint8_t fr = Roach_ReadFrontRightBumper() == BUMPER_TRIPPED;
-    uint8_t rl = Roach_ReadRearLeftBumper() == BUMPER_TRIPPED;
-    uint8_t rr = Roach_ReadRearRightBumper() == BUMPER_TRIPPED;
+    uint8_t fl = Bot_ReadFrontLeftBumper() == BUMPER_TRIPPED;
+    uint8_t fr = Bot_ReadFrontRightBumper() == BUMPER_TRIPPED;
     uint8_t rawState = (fl << 3) | (fr << 2) | (rl << 1) | rr;
 
     // shift history and store raw state, NOT lastEvent
@@ -175,25 +173,17 @@ uint8_t BumperEventChecker(void) {
         // unpack from the stable reading
         fl = (history[0] >> 3) & 1;
         fr = (history[0] >> 2) & 1;
-        rl = (history[0] >> 1) & 1;
-        rr = (history[0]) & 1;
 
         if (fl && fr && rl && rr) {
             curEvent = ALL_BUMPERS;
         } else if (fl && fr) {
             curEvent = FRONT_BUMPERS;
-        } else if (rl && rr) {
-            curEvent = BACK_BUMPERS;
         } else if (fl) {
             curEvent = FRONTLEFT_BUMPER;
         } else if (fr) {
             curEvent = FRONTRIGHT_BUMPER;
-        } else if (rl) {
-            curEvent = BACKLEFT_BUMPER;
-        } else if (rr) {
-            curEvent = BACKRIGHT_BUMPER;
         } else {
-            curEvent = NO_BUMPERS;  // <- fixed the || to &&
+            curEvent = NO_BUMPERS;
         }
     }
 
