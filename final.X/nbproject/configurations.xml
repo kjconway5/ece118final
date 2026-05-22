@@ -23,7 +23,10 @@
       <itemPath>../ECE118/include/LED.h</itemPath>
       <itemPath>../ECE118/include/pwm.h</itemPath>
       <itemPath>../ECE118/include/RC_Servo.h</itemPath>
-      <itemPath>../ECE118/include/sensormotor.h</itemPath>
+      <itemPath>EventChecker.h</itemPath>
+      <itemPath>BotHSM.h</itemPath>
+      <itemPath>ES_Configure.h</itemPath>
+      <itemPath>sensormotor.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -64,7 +67,9 @@
       <itemPath>../ECE118/src/LED.c</itemPath>
       <itemPath>../ECE118/src/pwm.c</itemPath>
       <itemPath>../ECE118/src/RC_Servo.c</itemPath>
-      <itemPath>../ECE118/src/sensormotor.c</itemPath>
+      <itemPath>EventChecker.c</itemPath>
+      <itemPath>BotHSM.c</itemPath>
+      <itemPath>sensormotor.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
