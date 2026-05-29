@@ -31,7 +31,7 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "BotHSM.h"
-#include "StartingSubHSM.h"
+#include "InISZSubHSM.h"
 #include "sensormotor.h"
 
 /*******************************************************************************
@@ -85,7 +85,7 @@ uint8_t InitStartingSubHSM(void) {
     ES_Event returnEvent;
 
     CurrentState = InitPSubState;
-    returnEvent = RunStartingSubHSM(INIT_EVENT);
+    returnEvent = RunInISZSubHSM(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -107,7 +107,7 @@ uint8_t InitStartingSubHSM(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
+ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     StartingSubHSMState_t nextState; // <- change type to correct enum
 
