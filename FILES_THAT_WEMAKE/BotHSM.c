@@ -33,6 +33,8 @@
 #include "BOARD.h"
 #include "BotHSM.h"
 #include "StartingSubHSM.h" //#include all sub state machines called
+#include "InISZSubHSM.h"
+#include "LocateISZSubHSM.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -142,9 +144,11 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
                 // transition from the initial pseudo-state into the actual
                 // initial state
                 // Initialize all sub-state machines
-                InitStartingSubHSM();
+                //InitStartingSubHSM();
+                //InitInISZSubHSM();
+                InitLocateISZSubHSM();
                 // now put the machine into the actual initial state
-                nextState = Starting;
+                nextState = LocateISZ;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -172,12 +176,24 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             // run sub-state machine for this state
             //NOTE: the SubState Machine runs and responds to events before anything in the this
             //state machine does
-            //ThisEvent = RunStartingSubHSM(ThisEvent);
+            ThisEvent = RunLocateISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case MOVE_TO_SHOOTING:
                     nextState = LocateISZ;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                case ES_NO_EVENT:
+                default:
+                    break;
+
+            }
+            break;
+        case InISZ: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            ThisEvent = RunInISZSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
                 case ES_NO_EVENT:
                 default:
                     break;

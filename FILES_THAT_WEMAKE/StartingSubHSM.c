@@ -33,6 +33,7 @@
 #include "BotHSM.h"
 #include "StartingSubHSM.h"
 #include "sensormotor.h"
+#include <stdio.h>
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -44,6 +45,10 @@ typedef enum {
     LeftTape,
     RightTape,
     Aligned,
+    Aligned2,
+    RightFirst,
+    RightSecond,
+    RightThird,
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
@@ -53,6 +58,10 @@ static const char *StateNames[] = {
 	"LeftTape",
 	"RightTape",
 	"Aligned",
+	"Aligned2",
+	"RightFirst",
+	"RightSecond",
+	"RightThird",
 };
 
 
@@ -137,7 +146,6 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
         case Spinning: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
                 TankRight(500);
-                ShootForward(700);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
@@ -147,6 +155,7 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 nextState = MoveForward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
+                printf("Spinning to MoveForward\n");
             }
             break;
         case MoveForward: // in the first state, replace this with appropriate state
@@ -157,9 +166,18 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                //                nextState = replacelater;
-                //                makeTransition = TRUE;
-                //                ThisEvent.EventType = ES_NO_EVENT;
+                nextState = LeftTape;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("MoveForward to LeftTape\n");
+
+            }
+            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
+                nextState = RightFirst;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("MoveForward to LeftTape\n");
+
             }
             break;
         case LeftTape: // in the first state, replace this with appropriate state
@@ -170,9 +188,10 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                //                nextState = replacelater;
-                //                makeTransition = TRUE;
-                //                ThisEvent.EventType = ES_NO_EVENT;
+                nextState = RightTape;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("LeftTape to RightTape\n");
             }
             break;
         case RightTape: // in the first state, replace this with appropriate state
@@ -183,9 +202,78 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                //                nextState = replacelater;
-                //                makeTransition = TRUE;
-                //                ThisEvent.EventType = ES_NO_EVENT;
+                nextState = Aligned;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("RightTape to \n");
+            }
+            break;
+        case Aligned: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == REAR_TAPE_ON) {
+                nextState = Aligned2;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("RightTape to \n");
+            }
+            break;
+        case Aligned2: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Event moveEvent;
+                moveEvent.EventType = MOVE_TO_LOCATE;
+                moveEvent.EventParam = 0;
+                PostBotHSM(moveEvent);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            break;
+
+        case RightFirst: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                DriveForward(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                nextState = RightTape;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("LeftTape to RightTape\n");
+            }
+            break;
+        case RightSecond: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                TankLeft(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = RightTape;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("LeftTape to RightTape\n");
+            }
+            break;
+        case RightThird: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                TurnLeft(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == REAR_TAPE_ON) {
+                nextState = Aligned2;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("LeftTape to RightTape\n");
             }
             break;
         default: // all unhandled states fall into here

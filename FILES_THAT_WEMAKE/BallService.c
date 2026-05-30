@@ -31,9 +31,9 @@
  ******************************************************************************/
 
 #define SHOOT_TIMER     2
-#define SHOOT_TIME_MS   300   // ? tune this
-#define SERVO_OPEN      1000  // 0 degrees, opens chute
-#define SERVO_CLOSED    1500  // 90 degrees, closes chute
+#define SHOOT_TIME_MS   200   // ? tune this
+#define SERVO_OPEN      1250  // 0 degrees, opens chute
+#define SERVO_CLOSED    2000  // 90 degrees, closes chute
 #define SERVO_PIN       RC_PORTX03
 
 /*******************************************************************************
@@ -115,14 +115,21 @@ ES_Event RunBallService(ES_Event ThisEvent) {
 
     switch (ThisEvent.EventType) {
         case ES_INIT:
+            printf("BallService: INIT\r\n");
             break;
         case SHOOT:
+            printf("BallService: SHOOT received, opening servo\r\n");
+
             RC_SetPulseTime(SERVO_PIN, SERVO_OPEN);
             ES_Timer_InitTimer(SHOOT_TIMER, SHOOT_TIME_MS);
             break;
         case ES_TIMEOUT:
+            printf("BallService: TIMEOUT param=%d\r\n", ThisEvent.EventParam);
+
             if (ThisEvent.EventParam == SHOOT_TIMER) {
                 RC_SetPulseTime(SERVO_PIN, SERVO_CLOSED);
+                printf("BallService: closing servo\r\n");
+
             }
             break;
         default:

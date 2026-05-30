@@ -26,7 +26,7 @@ uint8_t BumperEventChecker(void) {
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
-    uint8_t curLeft  = ReadLeftBumper()  > SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftBumper() > SENSOR_THRESHOLD;
     uint8_t curRight = ReadRightBumper() > SENSOR_THRESHOLD;
 
     if (curLeft != lastLeft) {
@@ -73,13 +73,13 @@ uint8_t BumperEventChecker(void) {
  ******************************************************************************/
 uint8_t TapeEventChecker(void) {
     static uint8_t lastFront = 0, lastRear = 0, lastLeft = 0, lastRight = 0;
-    static uint8_t cntFront = 0, cntRear  = 0, cntLeft  = 0, cntRight  = 0;
+    static uint8_t cntFront = 0, cntRear = 0, cntLeft = 0, cntRight = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
     uint8_t curFront = ReadFrontTape() > SENSOR_THRESHOLD;
-    uint8_t curRear  = ReadRearTape()  > SENSOR_THRESHOLD;
-    uint8_t curLeft  = ReadLeftTape()  > SENSOR_THRESHOLD;
+    uint8_t curRear = ReadRearTape() > SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftTape() > SENSOR_THRESHOLD;
     uint8_t curRight = ReadRightTape() > SENSOR_THRESHOLD;
 
     // Front
@@ -97,7 +97,9 @@ uint8_t TapeEventChecker(void) {
             SaveEvent(thisEvent);
 #endif
         }
-    } else { cntFront = 0; }
+    } else {
+        cntFront = 0;
+    }
 
     // Rear
     if (curRear != lastRear) {
@@ -114,7 +116,9 @@ uint8_t TapeEventChecker(void) {
             SaveEvent(thisEvent);
 #endif
         }
-    } else { cntRear = 0; }
+    } else {
+        cntRear = 0;
+    }
 
     // Left
     if (curLeft != lastLeft) {
@@ -126,12 +130,14 @@ uint8_t TapeEventChecker(void) {
             thisEvent.EventParam = curLeft;
             returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-            PostTemplateFSM(thisEvent);
+            PostBotHSM(thisEvent);
 #else
             SaveEvent(thisEvent);
 #endif
         }
-    } else { cntLeft = 0; }
+    } else {
+        cntLeft = 0;
+    }
 
     // Right
     if (curRight != lastRight) {
@@ -148,7 +154,9 @@ uint8_t TapeEventChecker(void) {
             SaveEvent(thisEvent);
 #endif
         }
-    } else { cntRight = 0; }
+    } else {
+        cntRight = 0;
+    }
 
     return returnVal;
 }
@@ -161,17 +169,20 @@ static uint8_t beaconDetected = 0;
 static uint8_t beaconCnt = 0;
 
 uint8_t BeaconEventChecker(void) {
+    static uint8_t lastState = 0; // 0 = not detected, 1 = detected
+    static uint8_t cnt = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
-    if (beaconDetected) return FALSE;
+    uint8_t curState = (ReadBeacon() < SENSOR_THRESHOLD);
 
-    if (ReadBeacon() < SENSOR_THRESHOLD) {
-        beaconCnt++;
-        if (beaconCnt >= 20) {
-            beaconDetected = 1;
-            thisEvent.EventType = BEACON_DETECTED;
-            thisEvent.EventParam = 0;
+    if (curState != lastState) {
+        cnt++;
+        if (cnt >= DEBOUNCE_COUNT) {
+            lastState = curState;
+            cnt = 0;
+            thisEvent.EventType = curState ? BEACON_DETECTED : BEACON_LOST;
+            thisEvent.EventParam = curState;
             returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
             PostBotHSM(thisEvent);
@@ -180,14 +191,10 @@ uint8_t BeaconEventChecker(void) {
 #endif
         }
     } else {
-        beaconCnt = 0;
+        cnt = 0;
     }
-    return returnVal;
-}
 
-void ResetBeaconDetector(void) {
-    beaconDetected = 0;
-    beaconCnt = 0;
+    return returnVal;
 }
 
 /*******************************************************************************
@@ -215,7 +222,9 @@ uint8_t TrackwireEventChecker(void) {
             SaveEvent(thisEvent);
 #endif
         }
-    } else { cnt = 0; }
+    } else {
+        cnt = 0;
+    }
 
     return returnVal;
 }

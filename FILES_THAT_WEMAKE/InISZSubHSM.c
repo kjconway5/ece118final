@@ -33,6 +33,7 @@
 #include "BotHSM.h"
 #include "InISZSubHSM.h"
 #include "sensormotor.h"
+#include "BallService.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -40,15 +41,18 @@
 typedef enum {
     InitPSubState,
     SpinningInISZ,
-    LaunchBall
+    LaunchBall,
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
 	"InitPSubState",
-    "SpinningInISZ"
-    "LaunchBall"
+	"SpinningInISZ",
+	"LaunchBall",
 };
 
+
+#define SPINUP_TIMER    3
+#define SPINUP_TIME_MS  1000
 
 
 /*******************************************************************************
@@ -81,7 +85,7 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitStartingSubHSM(void) {
+uint8_t InitInISZSubHSM(void) {
     ES_Event returnEvent;
 
     CurrentState = InitPSubState;
@@ -122,7 +126,7 @@ ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
                 // initial state
 
                 // now put the machine into the actual initial state
-                nextState = SpinningInISZ;
+                nextState = LaunchBall;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -137,34 +141,45 @@ ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == BEACON_DETECTED) {
-               nextState = LaunchBall;
-               makeTransition = TRUE;
-               ThisEvent.EventType = ES_NO_EVENT;
+                nextState = LaunchBall;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
         case LaunchBall:
             if (ThisEvent.EventType == ES_ENTRY) {
-                //Servo motor -- activate
+                ShootForward(500);
+                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS);
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT &&
+                    ThisEvent.EventParam == SPINUP_TIMER) {
+                // motors up to speed, let first ball through
+                ES_Event shootEvent;
+                shootEvent.EventType = SHOOT;
+                shootEvent.EventParam = 0;
+                PostBallService(shootEvent);
+                ThisEvent.EventType = ES_NO_EVENT;
+                // to shoot another ball immediately just call PostBallService again
             }
             if (ThisEvent.EventType == ES_EXIT) {
-                //Servo motor -- deactivate
                 StopShooting();
             }
-            if (ThisEvent.EventType == BEACON_LOST) {
-               nextState = SpinningInISZ;
-               makeTransition = TRUE;
-               ThisEvent.EventType = ES_NO_EVENT;
-            }
+            //            if (ThisEvent.EventType == BEACON_LOST) {
+            //               nextState = SpinningInISZ;
+            //               makeTransition = TRUE;
+            //               ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            break;
         default: // all unhandled states fall into here
             break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunStartingSubHSM(EXIT_EVENT); // <- rename to your own Run function
+        RunInISZSubHSM(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunStartingSubHSM(ENTRY_EVENT); // <- rename to your own Run function
+        RunInISZSubHSM(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
