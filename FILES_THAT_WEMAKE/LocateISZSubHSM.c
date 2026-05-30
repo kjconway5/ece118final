@@ -42,6 +42,7 @@ typedef enum {
     LCORNER,
     RCORNER,
     FORWARD,
+    FORWARD_OFF,
     BUMPED,
     CROSSING,
 } StartingSubHSMState_t;
@@ -51,6 +52,7 @@ static const char *StateNames[] = {
 	"LCORNER",
 	"RCORNER",
 	"FORWARD",
+    "FORWARD_OFF",
 	"BUMPED",
 	"CROSSING",
 };
@@ -165,9 +167,35 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
 
-            if (ThisEvent.EventType == LEFT_BUMPER_PRESSED ||
-                ThisEvent.EventType == RIGHT_BUMPER_PRESSED) {
+            if (ThisEvent.EventType == LEFT_BUMPER_PRESSED || ThisEvent.EventType == RIGHT_BUMPER_PRESSED) {
                 nextState = BUMPED;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+
+            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
+                nextState = FORWARD_OFF;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+
+            break;
+
+        case FORWARD_OFF:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                if (ThisEvent.EventType == RIGHT_TAPE_ON) {
+                    TurnRight(500);
+                } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                    TurnLeft(500);
+                } else {
+                    TurnLeft(500);
+                }
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -180,8 +208,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF &&
-                leftTapeOn == 0) {
+            if (ThisEvent.EventType == FRONT_TAPE_OFF && leftTapeOn == 0) {
                 nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -205,13 +232,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
 
         case BUMPED:
             if (ThisEvent.EventType == ES_ENTRY) {
-                if (PreviousState == LCORNER) {
-                    TankRight(500);
-                } else if (PreviousState == RCORNER) {
-                    TankLeft(500);
-                } else {
-                    TankRight(500);
-                }
+                TankLeft(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
