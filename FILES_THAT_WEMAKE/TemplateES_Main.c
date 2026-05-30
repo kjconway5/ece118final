@@ -4,6 +4,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "sensormotor.h"
+#include "RC_Servo.h"
 
 void main(void) {
     ES_Return_t ErrorType;
@@ -11,6 +12,7 @@ void main(void) {
     BOARD_Init();
     printf("Starting ES Framework Template\r\n");
     printf("using the 2nd Generation Events & Services Framework\r\n");
+    
 
 
     // Your hardware initialization function calls go here

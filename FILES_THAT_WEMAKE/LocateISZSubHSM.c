@@ -45,6 +45,9 @@ typedef enum {
     FORWARD_OFF,
     BUMPED,
     CROSSING,
+    LCORNER2,
+    RCORNER2,
+
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
@@ -52,12 +55,17 @@ static const char *StateNames[] = {
 	"LCORNER",
 	"RCORNER",
 	"FORWARD",
-    "FORWARD_OFF",
+	"FORWARD_OFF",
 	"BUMPED",
 	"CROSSING",
+	"LCORNER2",
+	"RCORNER2",
 };
 
 
+
+#define TURN_TIMER 4
+#define TURN_TIME 5000
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -71,14 +79,14 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static StartingSubHSMState_t CurrentState  = InitPSubState;
+static StartingSubHSMState_t CurrentState = InitPSubState;
 static StartingSubHSMState_t PreviousState = InitPSubState;
 static uint8_t MyPriority;
 
 // tape state tracking for combo detection
 static uint8_t frontTapeOn = 0;
 static uint8_t rightTapeOn = 0;
-static uint8_t leftTapeOn  = 0;
+static uint8_t leftTapeOn = 0;
 
 
 /*******************************************************************************
@@ -97,9 +105,9 @@ static uint8_t leftTapeOn  = 0;
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitLocateISZSubHSM(void) {
     ES_Event returnEvent;
-    CurrentState  = InitPSubState;
+    CurrentState = InitPSubState;
     PreviousState = InitPSubState;
-    returnEvent   = RunLocateISZSubHSM(INIT_EVENT);
+    returnEvent = RunLocateISZSubHSM(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -139,28 +147,40 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
         case FORWARD:
             if (ThisEvent.EventType == ES_ENTRY) {
                 DriveForward(500);
-                frontTapeOn = 0;  // reset tape flags on entry
+                frontTapeOn = 0; // reset tape flags on entry
                 rightTapeOn = 0;
-                leftTapeOn  = 0;
+                leftTapeOn = 0;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
 
             // track individual tape sensor states
-            if (ThisEvent.EventType == FRONT_TAPE_ON)  { frontTapeOn = 1; }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF) { frontTapeOn = 0; }
-            if (ThisEvent.EventType == RIGHT_TAPE_ON)  { rightTapeOn = 1; }
-            if (ThisEvent.EventType == RIGHT_TAPE_OFF) { rightTapeOn = 0; }
-            if (ThisEvent.EventType == LEFT_TAPE_ON)   { leftTapeOn  = 1; }
-            if (ThisEvent.EventType == LEFT_TAPE_OFF)  { leftTapeOn  = 0; }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                frontTapeOn = 1;
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
+                frontTapeOn = 0;
+            }
+            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
+                rightTapeOn = 1;
+            }
+            if (ThisEvent.EventType == RIGHT_TAPE_OFF) {
+                rightTapeOn = 0;
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                leftTapeOn = 1;
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_OFF) {
+                leftTapeOn = 0;
+            }
 
             // right corner: front + right sensors both on
             if (frontTapeOn && rightTapeOn) {
                 nextState = RCORNER;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            // left corner: front + left sensors both on
+                // left corner: front + left sensors both on
             } else if (frontTapeOn && leftTapeOn) {
                 nextState = LCORNER;
                 makeTransition = TRUE;
@@ -183,19 +203,57 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
 
         case FORWARD_OFF:
             if (ThisEvent.EventType == ES_ENTRY) {
-                if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                    TurnRight(500);
-                } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                    TurnLeft(500);
-                } else {
-                    TurnLeft(500);
-                }
+                DriveForward(500);
+            }
+
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                frontTapeOn = 1;
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
+                frontTapeOn = 0;
+            }
+            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
+                rightTapeOn = 1;
+            }
+            if (ThisEvent.EventType == RIGHT_TAPE_OFF) {
+                rightTapeOn = 0;
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                leftTapeOn = 1;
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_OFF) {
+                leftTapeOn = 0;
+            }
+
+            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
+                TurnRight(500);
+            } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                TurnLeft(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
+
+
             if (ThisEvent.EventType == FRONT_TAPE_ON) {
                 nextState = FORWARD;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            // right corner: front + right sensors both on
+            if (frontTapeOn && rightTapeOn) {
+                nextState = RCORNER;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                // left corner: front + left sensors both on
+            } else if (frontTapeOn && leftTapeOn) {
+                nextState = LCORNER;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+
+            if (ThisEvent.EventType == LEFT_BUMPER_PRESSED || ThisEvent.EventType == RIGHT_BUMPER_PRESSED) {
+                nextState = BUMPED;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -203,32 +261,63 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
 
         case LCORNER:
             if (ThisEvent.EventType == ES_ENTRY) {
-                TankLeft(500);
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+                TurnLeft(500);
+                //                StopDriving();
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF && leftTapeOn == 0) {
-                nextState = FORWARD;
+            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
+                nextState = LCORNER2;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case RCORNER:
+        case LCORNER2:
             if (ThisEvent.EventType == ES_ENTRY) {
-                TankRight(500);
+                //TurnLeft(500);
+                StopDriving();
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF &&
-                rightTapeOn == 0) {
-                nextState = FORWARD;
+            //            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+            //                nextState = FORWARD;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            break;
+
+        case RCORNER:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
+                nextState = RCORNER2;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
+        case RCORNER2:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StopDriving();
+                //                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            //            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+            //                nextState = FORWARD;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
 
         case BUMPED:
             if (ThisEvent.EventType == ES_ENTRY) {
@@ -265,7 +354,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
     if (makeTransition == TRUE) {
         RunLocateISZSubHSM(EXIT_EVENT);
         PreviousState = CurrentState;
-        CurrentState  = nextState;
+        CurrentState = nextState;
         RunLocateISZSubHSM(ENTRY_EVENT);
     }
 

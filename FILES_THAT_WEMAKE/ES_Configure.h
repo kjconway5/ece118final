@@ -126,7 +126,7 @@ static const char *EventNames[] = {
 #define TIMER1_RESP_FUNC TIMER_UNUSED        
 #define TIMER2_RESP_FUNC PostBallService
 #define TIMER3_RESP_FUNC PostBotHSM
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER4_RESP_FUNC PostBotHSM
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -196,7 +196,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_2_RUN RunBallService
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 3
+#define SERV_2_QUEUE_SIZE 10
 #endif
 
 
