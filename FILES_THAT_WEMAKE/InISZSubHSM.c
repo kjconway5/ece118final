@@ -42,24 +42,22 @@
 typedef enum {
     InitPSubState,
     SpinningInISZ,
-    Charge1, Charge2, Charge3, Charge4,
+    Charge1,
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
 	"InitPSubState",
 	"SpinningInISZ",
 	"Charge1",
-	"Charge2",
-	"Charge3",
-	"Charge4",
 };
 
 
-#define SPINUP_TIMER    3
-#define SPINUP_TIME_MS1  10000
-#define SPINUP_TIME_MS2  5000
-#define SPINUP_TIME_MS3  5000
-#define SPINUP_TIME_MS4  5000
+#define SPINUP_TIMER    5
+#define SPINUP_TIME_MS1  1000
+//#define SPINUP_TIME_MS2  5000
+//#define SPINUP_TIME_MS3  5000
+//#define SPINUP_TIME_MS4  5000
+
 
 
 /*******************************************************************************
@@ -77,7 +75,7 @@ static const char *StateNames[] = {
 static StartingSubHSMState_t CurrentState = InitPSubState; // <- change name to match ENUM
 static uint8_t MyPriority;
 
-
+int speed = 359;
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
@@ -155,84 +153,88 @@ ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
 
         case Charge1:
             if (ThisEvent.EventType == ES_ENTRY) {
-                printf("charge1\n");
                 ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS1);
-                ShootForward(250);
+                ShootForward(speed);
+                if (speed < 700) {
+                    speed += 50;
+                }
+
+
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 ES_Event shootEvent;
                 shootEvent.EventType = SHOOT;
                 shootEvent.EventParam = 0;
                 PostBallService(shootEvent);
-                StopShooting();
+                printf("charge1\n");
             }
             if (ThisEvent.EventType == ES_TIMEOUT &&
-                ThisEvent.EventParam == SPINUP_TIMER) {
-               nextState = Charge1;
-               makeTransition = TRUE;
-               ThisEvent.EventType = ES_NO_EVENT;
+                    ThisEvent.EventParam == SPINUP_TIMER) {
+                nextState = Charge1;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-//        case Charge2:
-//            if (ThisEvent.EventType == ES_ENTRY) {
-//                printf("charge1\n");
-//                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS2);
-//                ShootForward(500);
-//            }
-//            if (ThisEvent.EventType == ES_EXIT) {
-//                ES_Event shootEvent;
-//                shootEvent.EventType = SHOOT;
-//                shootEvent.EventParam = 0;
-//                PostBallService(shootEvent);
-//                StopShooting();
-//            }
-//            if (ThisEvent.EventType == ES_TIMEOUT &&
-//                ThisEvent.EventParam == SPINUP_TIMER) {
-//               nextState = Charge3;
-//               makeTransition = TRUE;
-//               ThisEvent.EventType = ES_NO_EVENT;
-//            }
-//            break;
-//        case Charge3:
-//            if (ThisEvent.EventType == ES_ENTRY) {
-//                printf("charge1\n");
-//                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS3);
-//                ShootForward(750);
-//            }
-//            if (ThisEvent.EventType == ES_EXIT) {
-//                ES_Event shootEvent;
-//                shootEvent.EventType = SHOOT;
-//                shootEvent.EventParam = 0;
-//                PostBallService(shootEvent);
-//                StopShooting();
-//            }
-//            if (ThisEvent.EventType == ES_TIMEOUT &&
-//                ThisEvent.EventParam == SPINUP_TIMER) {
-//               nextState = Charge4;
-//               makeTransition = TRUE;
-//               ThisEvent.EventType = ES_NO_EVENT;
-//            }
-//            break;
-//        case Charge4:
-//            if (ThisEvent.EventType == ES_ENTRY) {
-//                printf("charge1\n");
-//                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS4);
-//                ShootForward(1000);
-//            }
-//            if (ThisEvent.EventType == ES_EXIT) {
-//                ES_Event shootEvent;
-//                shootEvent.EventType = SHOOT;
-//                shootEvent.EventParam = 0;
-//                PostBallService(shootEvent);
-//                StopShooting();
-//            }
-//            if (ThisEvent.EventType == ES_TIMEOUT &&
-//                ThisEvent.EventParam == SPINUP_TIMER) {
-//               nextState = Charge1;
-//               makeTransition = TRUE;
-//               ThisEvent.EventType = ES_NO_EVENT;
-//            }
-//            break;
+            //        case Charge2:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                printf("charge1\n");
+            //                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS2);
+            //                ShootForward(500);
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                ES_Event shootEvent;
+            //                shootEvent.EventType = SHOOT;
+            //                shootEvent.EventParam = 0;
+            //                PostBallService(shootEvent);
+            //                StopShooting();
+            //            }
+            //            if (ThisEvent.EventType == ES_TIMEOUT &&
+            //                ThisEvent.EventParam == SPINUP_TIMER) {
+            //               nextState = Charge3;
+            //               makeTransition = TRUE;
+            //               ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            break;
+            //        case Charge3:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                printf("charge1\n");
+            //                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS3);
+            //                ShootForward(750);
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                ES_Event shootEvent;
+            //                shootEvent.EventType = SHOOT;
+            //                shootEvent.EventParam = 0;
+            //                PostBallService(shootEvent);
+            //                StopShooting();
+            //            }
+            //            if (ThisEvent.EventType == ES_TIMEOUT &&
+            //                ThisEvent.EventParam == SPINUP_TIMER) {
+            //               nextState = Charge4;
+            //               makeTransition = TRUE;
+            //               ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            break;
+            //        case Charge4:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                printf("charge1\n");
+            //                ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS4);
+            //                ShootForward(1000);
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                ES_Event shootEvent;
+            //                shootEvent.EventType = SHOOT;
+            //                shootEvent.EventParam = 0;
+            //                PostBallService(shootEvent);
+            //                StopShooting();
+            //            }
+            //            if (ThisEvent.EventType == ES_TIMEOUT &&
+            //                ThisEvent.EventParam == SPINUP_TIMER) {
+            //               nextState = Charge1;
+            //               makeTransition = TRUE;
+            //               ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            break;
         default: // all unhandled states fall into here
             break;
     } // end switch on Current State
