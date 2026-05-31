@@ -58,10 +58,9 @@
  * @author Gabriel H Elkaim, 2013.09.27 09:18
  * @modified Gabriel H Elkaim/Max Dunne, 2016.09.12 20:08 */
 //uint8_t TemplateCheckBattery(void);
-uint8_t TapeEventChecker(void);
 uint8_t BumperEventChecker(void);
+uint8_t TapeEventChecker(void);
 uint8_t BeaconEventChecker(void);
 uint8_t TrackwireEventChecker(void);
-
+void ResetBeaconDetector(void);
 #endif	/* TEMPLATEEVENTCHECKER_H */
-

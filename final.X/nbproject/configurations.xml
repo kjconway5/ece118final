@@ -4,6 +4,14 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>BallService.h</itemPath>
+      <itemPath>BotHSM.h</itemPath>
+      <itemPath>ES_Configure.h</itemPath>
+      <itemPath>EventChecker.h</itemPath>
+      <itemPath>InISZSubHSM.h</itemPath>
+      <itemPath>LocateISZSubHSM.h</itemPath>
+      <itemPath>sensormotor.h</itemPath>
+      <itemPath>StartingSubHSM.h</itemPath>
       <itemPath>../ECE118/include/AD.h</itemPath>
       <itemPath>../ECE118/include/BOARD.h</itemPath>
       <itemPath>../ECE118/include/ES_CheckEvents.h</itemPath>
@@ -23,10 +31,8 @@
       <itemPath>../ECE118/include/LED.h</itemPath>
       <itemPath>../ECE118/include/pwm.h</itemPath>
       <itemPath>../ECE118/include/RC_Servo.h</itemPath>
-      <itemPath>EventChecker.h</itemPath>
-      <itemPath>BotHSM.h</itemPath>
-      <itemPath>ES_Configure.h</itemPath>
-      <itemPath>sensormotor.h</itemPath>
+      <itemPath>../ECE118/include/serial.h</itemPath>
+      <itemPath>../ECE118/include/timers.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -67,14 +73,22 @@
       <itemPath>../ECE118/src/LED.c</itemPath>
       <itemPath>../ECE118/src/pwm.c</itemPath>
       <itemPath>../ECE118/src/RC_Servo.c</itemPath>
-      <itemPath>EventChecker.c</itemPath>
+      <itemPath>../ECE118/src/serial.c</itemPath>
+      <itemPath>../ECE118/src/timers.c</itemPath>
+      <itemPath>BallService.c</itemPath>
       <itemPath>BotHSM.c</itemPath>
+      <itemPath>EventChecker.c</itemPath>
+      <itemPath>InISZSubHSM.c</itemPath>
+      <itemPath>LocateISZSubHSM.c</itemPath>
       <itemPath>sensormotor.c</itemPath>
+      <itemPath>StartingSubHSM.c</itemPath>
+      <itemPath>TemplateES_Main.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
     <Elem>../../ece118_lab0/ECE118</Elem>
     <Elem>../ECE118</Elem>
+    <Elem>../FILES_THAT_WEMAKE</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -135,7 +149,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="expand-pragma-config" value="false"/>
-        <property key="extra-include-directories" value="../ECE118/include"/>
+        <property key="extra-include-directories" value=".;../ECE118/include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>

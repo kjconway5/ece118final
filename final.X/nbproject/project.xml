@@ -11,6 +11,7 @@
             <sourceRootList>
                 <sourceRootElem>../../ece118_lab0/ECE118</sourceRootElem>
                 <sourceRootElem>../ECE118</sourceRootElem>
+                <sourceRootElem>../FILES_THAT_WEMAKE</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

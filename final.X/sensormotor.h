@@ -33,4 +33,7 @@ void ShootForward(int speed);
 void ShootBackward(int speed);
 void StopShooting(void);
 
+void TurnRight(int speed);
+void TurnLeft(int speed);
+
 #endif // SENSORMOTOR_H

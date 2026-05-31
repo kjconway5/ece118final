@@ -1,18 +1,18 @@
 /*
- * File: TemplateFSM.c
+ * File: TemplateSubHSM.c
  * Author: J. Edward Carryer
- * Modified: Gabriel H Elkaim
+ * Modified: Gabriel Elkaim and Soja-Marie Morgens
  *
- * Template file to set up a Flat State Machine to work with the Events and Services
- * Frameword (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that this file
- * will need to be modified to fit your exact needs, and most of the names will have
- * to be changed to match your code.
+ * Template file to set up a Heirarchical State Machine to work with the Events and
+ * Services Framework (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that
+ * this file will need to be modified to fit your exact needs, and most of the names
+ * will have to be changed to match your code.
+ *
+ * There is another template file for the SubHSM's that is slightly differet, and
+ * should be used for all of the subordinate state machines (flat or heirarchical)
  *
  * This is provided as an example and a good place to start.
  *
- *Generally you will just be modifying the statenames and the run function
- *However make sure you do a find and replace to convert every instance of
- *  "Template" to your current state machine's name
  * History
  * When           Who     What/Why
  * -------------- ---     --------
@@ -30,59 +30,49 @@
 
 #include "ES_Configure.h"
 #include "ES_Framework.h"
-#include "ES_Timers.h"
-#include "RoachFSM.h"
-#include <BOARD.h>
-//Uncomment these for the Roaches
-#include "roach.h"
-//#include "RoachFrameworkEvents.h"
-#include <stdio.h>
-
+#include "BOARD.h"
+#include "BotHSM.h"
+#include "StartingSubHSM.h" //#include all sub state machines called
+#include "InISZSubHSM.h"
+#include "LocateISZSubHSM.h"
+/*******************************************************************************
+ * PRIVATE #DEFINES                                                            *
+ ******************************************************************************/
+//Include any defines you need to do
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define LEFT_MTR(x) Roach_LeftMtrSpeed(x)
-#define RIGHT_MTR(x) Roach_RightMtrSpeed(x)
-#define REVERSE_TIMER 0
-#define TURN_TIMER 1
-#define TURN_TIME 600
-#define REVERSE_TIME 1000
-#define DRIVE_SPEED 60
-#define TURN_SPEED 45
+
+
+typedef enum {
+    InitPState,
+    Starting,
+    LocateISZ,
+    InISZ,
+} BotHSMState_t;
+
+static const char *StateNames[] = {
+	"InitPState",
+	"Starting",
+	"LocateISZ",
+	"InISZ",
+};
+
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
 /* Prototypes for private functions for this machine. They should be functions
-   relevant to the behavior of this state machine.*/
-
-
+   relevant to the behavior of this state machine
+   Example: char RunAway(uint_8 seconds);*/
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
  ******************************************************************************/
-
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-typedef enum {
-    InitPState,
-    Hiding,
-    Fleeing,
-    Reversing,
-    Turning,
-} RoachFSMState_t;
-
-static const char *StateNames[] = {
-	"InitPState",
-	"Hiding",
-	"Fleeing",
-	"Reversing",
-	"Turning",
-};
-
-
-static RoachFSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
+static BotHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -91,7 +81,7 @@ static uint8_t MyPriority;
  ******************************************************************************/
 
 /**
- * @Function InitTemplateFSM(uint8_t Priority)
+ * @Function InitTemplateHSM(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
  * @return TRUE or FALSE
  * @brief This will get called by the framework at the beginning of the code
@@ -100,8 +90,7 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitRoachFSM(uint8_t Priority)
-{
+uint8_t InitBotHSM(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
@@ -114,7 +103,7 @@ uint8_t InitRoachFSM(uint8_t Priority)
 }
 
 /**
- * @Function PostTemplateFSM(ES_Event ThisEvent)
+ * @Function PostTemplateHSM(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be posted to queue
  * @return TRUE or FALSE
  * @brief This function is a wrapper to the queue posting function, and its name
@@ -122,150 +111,109 @@ uint8_t InitRoachFSM(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostRoachFSM(ES_Event ThisEvent)
-{
+uint8_t PostBotHSM(ES_Event ThisEvent) {
     return ES_PostToService(MyPriority, ThisEvent);
 }
 
 /**
- * @Function RunTemplateFSM(ES_Event ThisEvent)
+ * @Function RunTemplateHSM(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
  * @return Event - return event (type and param), in general should be ES_NO_EVENT
- * @brief This function is where you implement the whole of the flat state machine,
- *        as this is called any time a new event is passed to the event queue. This
- *        function will be called recursively to implement the correct order for a
- *        state transition to be: exit current state -> enter next state using the
- *        ES_EXIT and ES_ENTRY events.
+ * @brief This function is where you implement the whole of the heirarchical state
+ *        machine, as this is called any time a new event is passed to the event
+ *        queue. This function will be called recursively to implement the correct
+ *        order for a state transition to be: exit current state -> enter next state
+ *        using the ES_EXIT and ES_ENTRY events.
  * @note Remember to rename to something appropriate.
- *       Returns ES_NO_EVENT if the event have been "consumed."
- * @author J. Edward Carryer, 2011.10.23 19:25 */
-ES_Event RunRoachFSM(ES_Event ThisEvent) {
-    uint8_t makeTransition = FALSE;
-    RoachFSMState_t nextState;
+ *       The lower level state machines are run first, to see if the event is dealt
+ *       with there rather than at the current level. ES_EXIT and ES_ENTRY events are
+ *       not consumed as these need to pass pack to the higher level state machine.
+ * @author J. Edward Carryer, 2011.10.23 19:25
+ * @author Gabriel H Elkaim, 2011.10.23 19:25 */
+ES_Event RunBotHSM(ES_Event ThisEvent) {
+    uint8_t makeTransition = FALSE; // use to flag transition
+    BotHSMState_t nextState; // <- change type to correct enum
 
-    ES_Tattle();
+    ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-        case InitPState:
-            if (ThisEvent.EventType == ES_INIT) {
-                nextState = Fleeing;
+        case InitPState: // If current state is initial Pseudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
+                // Initialize all sub-state machines
+                //InitStartingSubHSM();
+                InitLocateISZSubHSM();
+                //InitInISZSubHSM();
+                // now put the machine into the actual initial state
+//                nextState = Starting;
+                nextState = LocateISZ;
+//                nextState = InISZ;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
+                ;
             }
             break;
 
-        case Fleeing:
+        case Starting: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            ThisEvent = RunStartingSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    LEFT_MTR(DRIVE_SPEED);
-                    RIGHT_MTR(DRIVE_SPEED);
-                    break;
-                case DARK_EVENT:
-                    nextState = Hiding;
+                case MOVE_TO_LOCATE:
+                    nextState = LocateISZ;
                     makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
-                case FRONT_BUMPERS:
-                case FRONTLEFT_BUMPER:
-                case FRONTRIGHT_BUMPER:
-                    nextState = Reversing;
-                    makeTransition = TRUE;
-                    break;
-                case ES_EXIT:
-                    LEFT_MTR(0);
-                    RIGHT_MTR(0);
-                    break;
+                case ES_NO_EVENT:
                 default:
                     break;
+
             }
             break;
-
-        case Hiding:
+        case LocateISZ: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            ThisEvent = RunLocateISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    LEFT_MTR(0);
-                    RIGHT_MTR(0);
-                    break;
-                case LIGHT_EVENT:
-                    nextState = Fleeing;
+                case MOVE_TO_SHOOTING:
+                    nextState = LocateISZ;
                     makeTransition = TRUE;
-                    break;
-                case ES_EXIT:
-                    break;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                case ES_NO_EVENT:
                 default:
                     break;
+
             }
             break;
-
-        case Reversing:
+        case InISZ: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            ThisEvent = RunInISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    LEFT_MTR(-DRIVE_SPEED);
-                    RIGHT_MTR(-DRIVE_SPEED);
-                    ES_Timer_InitTimer(REVERSE_TIMER, REVERSE_TIME);
-                    break;
-                case ES_TIMEOUT:
-                case BACK_BUMPERS:
-                case BACKLEFT_BUMPER:
-                case BACKRIGHT_BUMPER:
-                    nextState = Turning;
-                    makeTransition = TRUE;
-                    break;
-                case FRONT_BUMPERS:
-                case FRONTLEFT_BUMPER:
-                case FRONTRIGHT_BUMPER:
-                    break;  // intentionally ignored, drains the queue
-                case ES_EXIT:
-                    LEFT_MTR(0);
-                    RIGHT_MTR(0);
-                    ES_Timer_StopTimer(REVERSE_TIMER);
-                    break;
+                case ES_NO_EVENT:
                 default:
                     break;
+
             }
             break;
-
-        case Turning:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    LEFT_MTR(TURN_SPEED);
-                    RIGHT_MTR(-TURN_SPEED);
-                    ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
-                    break;
-                case ES_TIMEOUT:
-                    nextState = Fleeing;
-                    makeTransition = TRUE;
-                    break;
-                case FRONT_BUMPERS:
-                case FRONTLEFT_BUMPER:
-                case FRONTRIGHT_BUMPER:
-                    nextState = Reversing;
-                    makeTransition = TRUE;
-                    break;
-                case BACK_BUMPERS:
-                case BACKLEFT_BUMPER:
-                case BACKRIGHT_BUMPER:
-                    break; // intentionally ignored, drains the queue
-                case ES_EXIT:
-                    LEFT_MTR(0);
-                    RIGHT_MTR(0);
-                    ES_Timer_StopTimer(TURN_TIMER);
-                    break;
-                default:
-                    break;
-            }
+        default: // all unhandled states fall into here
             break;
+    } // end switch on Current State
 
-        default:
-            break;
-    }
-
-    if (makeTransition == TRUE) {
-        RunRoachFSM(EXIT_EVENT);
+    if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
+        // recursively call the current state with an exit event
+        RunBotHSM(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunRoachFSM(ENTRY_EVENT);
+        RunBotHSM(ENTRY_EVENT); // <- rename to your own Run function
     }
 
-    ES_Tail();
+    ES_Tail(); // trace call stack end
     return ThisEvent;
 }
 

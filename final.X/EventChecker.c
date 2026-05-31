@@ -1,31 +1,3 @@
-/*
- * File:   TemplateEventChecker.c
- * Author: Gabriel Hugh Elkaim
- *
- * Template file to set up typical EventCheckers for the  Events and Services
- * Framework (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that
- * this file will need to be modified to fit your exact needs, and most of the
- * names will have to be changed to match your code.
- *
- * This EventCheckers file will work with both FSM's and HSM's.
- *
- * Remember that EventCheckers should only return TRUE when an event has occured,
- * and that the event is a TRANSITION between two detectable differences. They
- * should also be atomic and run as fast as possible for good results.
- *
- * This file includes a test harness that will run the event detectors listed in the
- * ES_Configure file in the project, and will conditionally compile main if the macro
- * EVENTCHECKER_TEST is defined (either in the project or in the file). This will allow
- * you to check you event detectors in their own project, and then leave them untouched
- * for your project unless you need to alter their post functions.
- *
- * Created on September 27, 2013, 8:37 AM
- */
-
-/*******************************************************************************
- * MODULE #INCLUDE                                                             *
- ******************************************************************************/
-
 #include "ES_Configure.h"
 #include "EventChecker.h"
 #include "ES_Events.h"
@@ -34,280 +6,249 @@
 #include "sensormotor.h"
 #include "BotHSM.h"
 
-/*******************************************************************************
- * MODULE #DEFINES                                                             *
- ******************************************************************************/
-#define TAPE_THRESHOLD 900
-
-/*******************************************************************************
- * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
- ******************************************************************************/
+#define SENSOR_THRESHOLD  500
+#define DEBOUNCE_COUNT    5    // number of consecutive identical readings required
 
 //#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 #define SaveEvent(x) do {eventName=__func__; storedEvent=x;} while (0)
-
 static const char *eventName;
 static ES_Event storedEvent;
 #endif
 
 /*******************************************************************************
- * PRIVATE FUNCTION PROTOTYPES                                                 *
+ * BUMPERS
  ******************************************************************************/
-/* Prototypes for private functions for this EventChecker. They should be functions
-   relevant to the behavior of this particular event checker */
-
-/*******************************************************************************
- * PRIVATE MODULE VARIABLES                                                    *
- ******************************************************************************/
-
-/* Any private module level variable that you might need for keeping track of
-   events would be placed here. Private variables should be STATIC so that they
-   are limited in scope to this module. */
-
-/*******************************************************************************
- * PUBLIC FUNCTIONS                                                            *
- ******************************************************************************/
-
-/**
- * @Function TemplateCheckBattery(void)
- * @param none
- * @return TRUE or FALSE
- * @brief This function is a prototype event checker that checks the battery voltage
- *        against a fixed threshold (#defined in the .c file). Note that you need to
- *        keep track of previous history, and that the actual battery voltage is checked
- *        only once at the beginning of the function. The function will post an event
- *        of either BATTERY_CONNECTED or BATTERY_DISCONNECTED if the power switch is turned
- *        on or off with the USB cord plugged into the Uno32. Returns TRUE if there was an 
- *        event, FALSE otherwise.
- * @note Use this code as a template for your other event checkers, and modify as necessary.
- * @author Gabriel H Elkaim, 2013.09.27 09:18
- * @modified Gabriel H Elkaim/Max Dunne, 2016.09.12 20:08 */
-/*
-uint8_t TemplateCheckBattery(void) {
-    static ES_EventTyp_t lastEvent = BATTERY_DISCONNECTED;
-    ES_EventTyp_t curEvent;
-    ES_Event thisEvent;
-    uint8_t returnVal = FALSE;
-    uint16_t batVoltage = AD_ReadADPin(BAT_VOLTAGE); // read the battery voltage
-
-    if (batVoltage > BATTERY_DISCONNECT_THRESHOLD) { // is battery connected?
-        curEvent = BATTERY_CONNECTED;
-    } else {
-        curEvent = BATTERY_DISCONNECTED;
-    }
-    if (curEvent != lastEvent) { // check for change from last time
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = batVoltage;
-        returnVal = TRUE;
-        lastEvent = curEvent; // update history
-#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-        PostGenericService(thisEvent);
-#else
-        SaveEvent(thisEvent);
-#endif   
-    }
-    return (returnVal);
-}
-*/
- 
-uint8_t TapeEventChecker(void) {
-    static ES_EventTyp_t lastEvent = NO_TAPE;
-    ES_EventTyp_t curEvent;
-    ES_Event thisEvent;
-    uint8_t returnVal = FALSE;
-    unsigned int l_temp = ReadLeftTape();
-    unsigned int c_temp = ReadCenterTape();
-    unsigned int r_temp = ReadRightTape();
-    
-    uint8_t l = l_temp > TAPE_THRESHOLD;
-    uint8_t c = c_temp > TAPE_THRESHOLD;
-    uint8_t r = r_temp > TAPE_THRESHOLD;
-    
-    uint8_t rawState = (l << 2) | (c << 1) | r;
-    
-    if (l && c && r) {
-        curEvent = ALL_TAPE;
-    } else if (l && c) {
-        curEvent = CL_TAPE;
-    } else if (c && r) {
-        curEvent = CR_TAPE;
-    } else if (c) {
-        curEvent = CENTER_TAPE;
-    } else if (l) {
-        curEvent = LEFT_TAPE;
-    } else if (r) {
-        curEvent = RIGHT_TAPE;
-    } else {
-        curEvent = NO_TAPE;
-    }
-    
-    if (curEvent != lastEvent) {
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = rawState;
-        returnVal = TRUE;
-        lastEvent = curEvent;
-    #ifndef EVENTCHECKER_TEST
-        PostRoachFSM(thisEvent);
-    #else
-        SaveEvent(thisEvent);
-    #endif   
-    }
-
-    return(returnVal);
-}
-
 uint8_t BumperEventChecker(void) {
-    static ES_EventTyp_t lastEvent = NO_BUMPERS;
-    static uint8_t history[4] = {0, 0, 0, 0};
-    ES_EventTyp_t curEvent = lastEvent;  // default to no change
+    static uint8_t lastLeft = 0, lastRight = 0;
+    static uint8_t cntLeft = 0, cntRight = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
-    // read and pack raw state into a single byte
-    uint8_t l = ReadLeftBumper() == BUMPER_TRIPPED;
-    uint8_t r = ReadRightBumper() == BUMPER_TRIPPED;
-    uint8_t rawState = (l << 1) | r;
+    uint8_t curLeft = ReadLeftBumper() > SENSOR_THRESHOLD;
+    uint8_t curRight = ReadRightBumper() > SENSOR_THRESHOLD;
 
-    // shift history and store raw state, NOT lastEvent
-    history[3] = history[2];
-    history[2] = history[1];
-    history[1] = history[0];
-    history[0] = rawState;
-
-    // only act if last 4 readings are identical (stable)
-    if (history[0] == history[1] && 
-        history[1] == history[2] && 
-        history[2] == history[3]) {
-
-        // unpack from the stable reading
-        l = (history[0] >> 1) & 1;
-        r = history[0] & 1;
-
-        if (l && r) {
-            curEvent = ALL_BUMPERS;
-        } else if (l) {
-            curEvent = LEFT_BUMPER;
-        } else if (r) {
-            curEvent = RIGHT_BUMPER;
-        } else {
-            curEvent = NO_BUMPERS;  
-        }
-    }
-
-    if (curEvent != lastEvent) {
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = rawState;
-        returnVal = TRUE;
-        lastEvent = curEvent;
+    if (curLeft != lastLeft) {
+        cntLeft++;
+        if (cntLeft >= DEBOUNCE_COUNT) {
+            lastLeft = curLeft;
+            cntLeft = 0;
+            thisEvent.EventType = curLeft ? LEFT_BUMPER_PRESSED : LEFT_BUMPER_RELEASED;
+            thisEvent.EventParam = curLeft;
+            returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-        PostRoachFSM(thisEvent);
+            PostBotHSM(thisEvent);
 #else
-        SaveEvent(thisEvent);
+            SaveEvent(thisEvent);
 #endif
+        }
+    } else {
+        cntLeft = 0;
     }
+
+    if (curRight != lastRight) {
+        cntRight++;
+        if (cntRight >= DEBOUNCE_COUNT) {
+            lastRight = curRight;
+            cntRight = 0;
+            thisEvent.EventType = curRight ? RIGHT_BUMPER_PRESSED : RIGHT_BUMPER_RELEASED;
+            thisEvent.EventParam = curRight;
+            returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+            PostBotHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    } else {
+        cntRight = 0;
+    }
+
     return returnVal;
 }
+
+/*******************************************************************************
+ * TAPE SENSORS
+ ******************************************************************************/
+uint8_t TapeEventChecker(void) {
+    static uint8_t lastFront = 0, lastRear = 0, lastLeft = 0, lastRight = 0;
+    static uint8_t cntFront = 0, cntRear = 0, cntLeft = 0, cntRight = 0;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+
+    uint8_t curFront = ReadFrontTape() > SENSOR_THRESHOLD;
+    uint8_t curRear = ReadRearTape() > SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftTape() > SENSOR_THRESHOLD;
+    uint8_t curRight = ReadRightTape() > SENSOR_THRESHOLD;
+
+    // Front
+    if (curFront != lastFront) {
+        cntFront++;
+        if (cntFront >= DEBOUNCE_COUNT) {
+            lastFront = curFront;
+            cntFront = 0;
+            thisEvent.EventType = curFront ? FRONT_TAPE_ON : FRONT_TAPE_OFF;
+            thisEvent.EventParam = curFront;
+            returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+            PostBotHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    } else {
+        cntFront = 0;
+    }
+
+    // Rear
+    if (curRear != lastRear) {
+        cntRear++;
+        if (cntRear >= DEBOUNCE_COUNT) {
+            lastRear = curRear;
+            cntRear = 0;
+            thisEvent.EventType = curRear ? REAR_TAPE_ON : REAR_TAPE_OFF;
+            thisEvent.EventParam = curRear;
+            returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+            PostBotHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    } else {
+        cntRear = 0;
+    }
+
+    // Left
+    if (curLeft != lastLeft) {
+        cntLeft++;
+        if (cntLeft >= DEBOUNCE_COUNT) {
+            lastLeft = curLeft;
+            cntLeft = 0;
+            thisEvent.EventType = curLeft ? LEFT_TAPE_ON : LEFT_TAPE_OFF;
+            thisEvent.EventParam = curLeft;
+            returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+            PostBotHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    } else {
+        cntLeft = 0;
+    }
+
+    // Right
+    if (curRight != lastRight) {
+        cntRight++;
+        if (cntRight >= DEBOUNCE_COUNT) {
+            lastRight = curRight;
+            cntRight = 0;
+            thisEvent.EventType = curRight ? RIGHT_TAPE_ON : RIGHT_TAPE_OFF;
+            thisEvent.EventParam = curRight;
+            returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+            PostBotHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    } else {
+        cntRight = 0;
+    }
+
+    return returnVal;
+}
+
+/*******************************************************************************
+ * BEACON
+ ******************************************************************************/
+// at the top of EventChecker.c, near the other module variables
+static uint8_t beaconDetected = 0;
+static uint8_t beaconCnt = 0;
 
 uint8_t BeaconEventChecker(void) {
-    static ES_EventTyp_t lastEvent = NO_BEACON;
-    ES_EventTyp_t curEvent;
+    static uint8_t lastState = 0; // 0 = not detected, 1 = detected
+    static uint8_t cnt = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    unsigned int beacon_state = ReadBeacon();
-    
-    if (beacon_state) {
-        curEvent = BEACON_DETECTED;
-    } else {
-        curEvent = NO_BEACON;
-    }
-    
-    if (curEvent != lastEvent) {
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = beacon_state;
-        returnVal = TRUE;
-        lastEvent = curEvent;
+
+    uint8_t curState = (ReadBeacon() < SENSOR_THRESHOLD);
+
+    if (curState != lastState) {
+        cnt++;
+        if (cnt >= DEBOUNCE_COUNT) {
+            lastState = curState;
+            cnt = 0;
+            thisEvent.EventType = curState ? BEACON_DETECTED : BEACON_LOST;
+            thisEvent.EventParam = curState;
+            returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-        PostRoachFSM(thisEvent);
+            PostBotHSM(thisEvent);
 #else
-        SaveEvent(thisEvent);
+            SaveEvent(thisEvent);
 #endif
+        }
+    } else {
+        cnt = 0;
     }
+
     return returnVal;
 }
 
+/*******************************************************************************
+ * TRACKWIRE
+ ******************************************************************************/
 uint8_t TrackwireEventChecker(void) {
-    static ES_EventTyp_t lastEvent = NO_TRACKWIRE;
-    ES_EventTyp_t curEvent;
+    static uint8_t lastState = 0;
+    static uint8_t cnt = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    unsigned int trackwire_state = ReadTrackwire();
-    
-    if (trackwire_state) {
-        curEvent = TRACKWIRE_DETECTED;
-    } else {
-        curEvent = NO_TRACKWIRE;
-    }
-    
-    if (curEvent != lastEvent) {
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = trackwire_state;
-        returnVal = TRUE;
-        lastEvent = curEvent;
+
+    uint8_t curState = ReadTrackWire() < SENSOR_THRESHOLD;
+
+    if (curState != lastState) {
+        cnt++;
+        if (cnt >= DEBOUNCE_COUNT) {
+            lastState = curState;
+            cnt = 0;
+            thisEvent.EventType = curState ? TRACKWIRE_DETECTED : TRACKWIRE_LOST;
+            thisEvent.EventParam = curState;
+            returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-        PostRoachFSM(thisEvent);
+            PostBotHSM(thisEvent);
 #else
-        SaveEvent(thisEvent);
+            SaveEvent(thisEvent);
 #endif
+        }
+    } else {
+        cnt = 0;
     }
+
     return returnVal;
 }
 
-/* 
- * The Test Harness for the event checkers is conditionally compiled using
- * the EVENTCHECKER_TEST macro (defined either in the file or at the project level).
- * No other main() can exist within the project.
- * 
- * It requires a valid ES_Configure.h file in the project with the correct events in 
- * the enum, and the correct list of event checkers in the EVENT_CHECK_LIST.
- * 
- * The test harness will run each of your event detectors identically to the way the
- * ES_Framework will call them, and if an event is detected it will print out the function
- * name, event, and event parameter. Use this to test your event checking code and
- * ensure that it is fully functional.
- * 
- * If you are locking up the output, most likely you are generating too many events.
- * Remember that events are detectable changes, not a state in itself.
- * 
- * Once you have fully tested your event checking code, you can leave it in its own
- * project and point to it from your other projects. If the EVENTCHECKER_TEST marco is
- * defined in the project, no changes are necessary for your event checkers to work
- * with your other projects.
- */
+/*******************************************************************************
+ * TEST HARNESS
+ ******************************************************************************/
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 static uint8_t(*EventList[])(void) = {EVENT_CHECK_LIST};
-
 void PrintEvent(void);
 
 void main(void) {
     BOARD_Init();
-    /* user initialization code goes here */
-    Roach_Init();
-    // Do not alter anything below this line
+    SensorMotorInit();
     int i;
-
     printf("\r\nEvent checking test harness for %s", __FILE__);
-
     while (1) {
         if (IsTransmitEmpty()) {
-            for (i = 0; i< sizeof (EventList) >> 2; i++) {
+            for (i = 0; i < sizeof (EventList) >> 2; i++) {
                 if (EventList[i]() == TRUE) {
                     PrintEvent();
                     break;
                 }
-
             }
         }
     }

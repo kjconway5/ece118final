@@ -74,7 +74,7 @@ void SensorMotorInit(void) {
 
 }
 
-int (void) {
+int ReadLeftTape(void) {
     return AD_ReadADPin(LeftTapePin);
 }
 
@@ -129,11 +129,11 @@ void DriveBackward(int speed) {
 }
 
 void ShootForward(int speed) {
-    IO_PortsSetPortBits(PORTZ, LeftShooterIN1);
-    IO_PortsClearPortBits(PORTZ, LeftShooterIN2);
+    IO_PortsClearPortBits(PORTZ, LeftShooterIN1);
+    IO_PortsSetPortBits(PORTZ, LeftShooterIN2);
 
-    IO_PortsSetPortBits(PORTZ, RightShooterIN1);
-    IO_PortsClearPortBits(PORTZ, RightShooterIN2);
+    IO_PortsClearPortBits(PORTZ, RightShooterIN1);
+    IO_PortsSetPortBits(PORTZ, RightShooterIN2);
 
     PWM_SetDutyCycle(LeftShootMotorPWM, speed);
     PWM_SetDutyCycle(RightShootMotorPWM, speed);
@@ -192,4 +192,26 @@ void StopShooting(void) {
 
     PWM_SetDutyCycle(LeftShootMotorPWM, 0);
     PWM_SetDutyCycle(RightShootMotorPWM, 0);
+}
+
+void TurnRight(int speed) {
+    IO_PortsSetPortBits(PORTZ, LeftDriveIN1);
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN2);
+
+    IO_PortsClearPortBits(PORTZ, RightDriveIN2);
+    IO_PortsClearPortBits(PORTZ, RightDriveIN1);
+
+    PWM_SetDutyCycle(LeftDriveMotorPWM, speed);
+    PWM_SetDutyCycle(RightDriveMotorPWM, 0);
+}
+
+void TurnLeft(int speed) {
+    IO_PortsSetPortBits(PORTZ, LeftDriveIN1);
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN2);
+
+    IO_PortsClearPortBits(PORTZ, RightDriveIN2);
+    IO_PortsClearPortBits(PORTZ, RightDriveIN1);
+
+    PWM_SetDutyCycle(LeftDriveMotorPWM, speed);
+    PWM_SetDutyCycle(RightDriveMotorPWM, 0);
 }

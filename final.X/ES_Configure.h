@@ -23,7 +23,7 @@
 //#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostRoachFSM
 
 //define for TattleTale
-//define USE_TATTLETALE
+//#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
@@ -44,27 +44,28 @@ typedef enum {
     ES_TIMERACTIVE, /* signals that a timer has become active */
     ES_TIMERSTOPPED, /* signals that a timer has stopped*/
     /* User-defined events start here */
-    LIGHT_EVENT,
-    DARK_EVENT,
-
-    NO_BUMPERS,
-    ALL_BUMPERS,
-    LEFT_BUMPER,
-    RIGHT_BUMPER,
-
-    NO_TAPE,
-    CL_TAPE,
-    CR_TAPE,
-    ALL_TAPE,
-    CENTER_TAPE,
-    LEFT_TAPE,
-    RIGHT_TAPE,
-
+    LEFT_BUMPER_PRESSED,
+    LEFT_BUMPER_RELEASED,
+    RIGHT_BUMPER_PRESSED,
+    RIGHT_BUMPER_RELEASED,
+    FRONT_TAPE_ON,
+    FRONT_TAPE_OFF,
+    REAR_TAPE_ON,
+    REAR_TAPE_OFF,
+    LEFT_TAPE_ON,
+    LEFT_TAPE_OFF,
+    RIGHT_TAPE_ON,
+    RIGHT_TAPE_OFF,
     BEACON_DETECTED,
-    NO_BEACON,
-
+    BEACON_LOST,
     TRACKWIRE_DETECTED,
-    NO_TRACKWIRE,
+    TRACKWIRE_LOST,
+
+    MOVE_TO_LOCATE,
+    MOVE_TO_SHOOTING,
+
+    SHOOT,
+
 
     /* User-defined events end here */
     NUMBEROFEVENTS,
@@ -81,22 +82,25 @@ static const char *EventNames[] = {
 	"ES_TIMEOUT",
 	"ES_TIMERACTIVE",
 	"ES_TIMERSTOPPED",
-	"LIGHT_EVENT",
-	"DARK_EVENT",
-
-	"NO_BUMPERS",
-	"ALL_BUMPERS",
-	"LEFT_BUMPER",
-	"RIGHT_BUMPER",
-
-	"NO_TAPE",
-	"CL_TAPE",
-	"CR_TAPE",
-	"ALL_TAPE",
-	"CENTER_TAPE",
-	"LEFT_TAPE",
-	"RIGHT_TAPE",
-
+	"LEFT_BUMPER_PRESSED",
+	"LEFT_BUMPER_RELEASED",
+	"RIGHT_BUMPER_PRESSED",
+	"RIGHT_BUMPER_RELEASED",
+	"FRONT_TAPE_ON",
+	"FRONT_TAPE_OFF",
+	"REAR_TAPE_ON",
+	"REAR_TAPE_OFF",
+	"LEFT_TAPE_ON",
+	"LEFT_TAPE_OFF",
+	"RIGHT_TAPE_ON",
+	"RIGHT_TAPE_OFF",
+	"BEACON_DETECTED",
+	"BEACON_LOST",
+	"TRACKWIRE_DETECTED",
+	"TRACKWIRE_LOST",
+	"MOVE_TO_LOCATE",
+	"MOVE_TO_SHOOTING",
+	"SHOOT",
 	"NUMBEROFEVENTS",
 };
 
@@ -112,18 +116,17 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST BumperEventChecker, LightEventChecker
-
+#define EVENT_CHECK_LIST BumperEventChecker, TapeEventChecker, BeaconEventChecker, TrackwireEventChecker
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
 // corresponding timer expires. All 16 must be defined. If you are not using
 // a timers, then you can use TIMER_UNUSED
 #define TIMER_UNUSED ((pPostFunc)0)
-#define TIMER0_RESP_FUNC PostRoachFSM
-#define TIMER1_RESP_FUNC PostRoachFSM
-#define TIMER2_RESP_FUNC TIMER_UNUSED
-#define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER0_RESP_FUNC TIMER_UNUSED   
+#define TIMER1_RESP_FUNC TIMER_UNUSED        
+#define TIMER2_RESP_FUNC PostBallService
+#define TIMER3_RESP_FUNC PostBotHSM
+#define TIMER4_RESP_FUNC PostBotHSM
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -155,7 +158,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 2
+#define NUM_SERVICES 3
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service
@@ -175,11 +178,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public function prototypes
-#define SERV_1_HEADER "RoachFSM.h"
+#define SERV_1_HEADER "BotHSM.h"
 // the name of the Init function
-#define SERV_1_INIT InitRoachFSM
+#define SERV_1_INIT InitBotHSM
 // the name of the run function
-#define SERV_1_RUN RunRoachFSM
+#define SERV_1_RUN RunBotHSM
 // How big should this services Queue be?
 #define SERV_1_QUEUE_SIZE 10
 #endif
@@ -187,13 +190,13 @@ static const char *EventNames[] = {
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public function prototypes
-#define SERV_2_HEADER "TestService.h"
+#define SERV_2_HEADER "BallService.h"
 // the name of the Init function
-#define SERV_2_INIT TestServiceInit
+#define SERV_2_INIT InitBallService
 // the name of the run function
-#define SERV_2_RUN TestServiceRun
+#define SERV_2_RUN RunBallService
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 3
+#define SERV_2_QUEUE_SIZE 10
 #endif
 
 

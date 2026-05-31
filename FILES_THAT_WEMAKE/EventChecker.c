@@ -4,7 +4,7 @@
 #include "serial.h"
 #include "AD.h"
 #include "sensormotor.h"
-#include "TemplateFSM.h"
+#include "BotHSM.h"
 
 #define SENSOR_THRESHOLD  500
 #define DEBOUNCE_COUNT    5    // number of consecutive identical readings required
