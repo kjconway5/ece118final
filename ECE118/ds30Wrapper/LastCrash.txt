@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/kye/School/ECE118/ece118final/ECE118/ds30Wrapper/ece118/guiWidgets/SerialIO.py", line 73, in updateOutput
+    def updateOutput(self):
+    
+KeyboardInterrupt

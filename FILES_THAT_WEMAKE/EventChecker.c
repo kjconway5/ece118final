@@ -157,7 +157,6 @@ uint8_t TapeEventChecker(void) {
     } else {
         cntRight = 0;
     }
-
     return returnVal;
 }
 

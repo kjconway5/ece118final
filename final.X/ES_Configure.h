@@ -11,9 +11,11 @@
  -------------- ---     --------
  01/15/12 10:03 jec      started coding
  *****************************************************************************/
+#include <stdio.h>
 
 #ifndef CONFIGURE_H
 #define CONFIGURE_H
+
 
 
 
@@ -48,6 +50,7 @@ typedef enum {
     LEFT_BUMPER_RELEASED,
     RIGHT_BUMPER_PRESSED,
     RIGHT_BUMPER_RELEASED,
+
     FRONT_TAPE_ON,
     FRONT_TAPE_OFF,
     REAR_TAPE_ON,
@@ -56,6 +59,7 @@ typedef enum {
     LEFT_TAPE_OFF,
     RIGHT_TAPE_ON,
     RIGHT_TAPE_OFF,
+
     BEACON_DETECTED,
     BEACON_LOST,
     TRACKWIRE_DETECTED,
@@ -86,14 +90,16 @@ static const char *EventNames[] = {
 	"LEFT_BUMPER_RELEASED",
 	"RIGHT_BUMPER_PRESSED",
 	"RIGHT_BUMPER_RELEASED",
-	"FRONT_TAPE_ON",
-	"FRONT_TAPE_OFF",
-	"REAR_TAPE_ON",
-	"REAR_TAPE_OFF",
-	"LEFT_TAPE_ON",
-	"LEFT_TAPE_OFF",
-	"RIGHT_TAPE_ON",
-	"RIGHT_TAPE_OFF",
+	"ALL_TAPE",
+	"CL_TAPE",
+	"CR_TAPE",
+	"CENTER_TAPE",
+    "CENTER_TAPE_OFF",
+	"LEFT_TAPE",
+	"RIGHT_TAPE",
+	"NO_TAPE",
+    "CB_TAPE",
+    "BACK_TAPE",
 	"BEACON_DETECTED",
 	"BEACON_LOST",
 	"TRACKWIRE_DETECTED",
@@ -127,9 +133,9 @@ static const char *EventNames[] = {
 #define TIMER2_RESP_FUNC PostBallService
 #define TIMER3_RESP_FUNC PostBotHSM
 #define TIMER4_RESP_FUNC PostBotHSM
-#define TIMER5_RESP_FUNC TIMER_UNUSED
-#define TIMER6_RESP_FUNC TIMER_UNUSED
-#define TIMER7_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC PostBotHSM
+#define TIMER6_RESP_FUNC PostBotHSM
+#define TIMER7_RESP_FUNC PostBotHSM
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED

@@ -77,10 +77,10 @@ uint8_t TapeEventChecker(void) {
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
-    uint8_t curFront = ReadFrontTape() > SENSOR_THRESHOLD;
-    uint8_t curRear = ReadRearTape() > SENSOR_THRESHOLD;
-    uint8_t curLeft = ReadLeftTape() > SENSOR_THRESHOLD;
-    uint8_t curRight = ReadRightTape() > SENSOR_THRESHOLD;
+    uint8_t curFront = ReadFrontTape() < SENSOR_THRESHOLD;
+    uint8_t curRear = ReadRearTape()   > SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftTape()   > SENSOR_THRESHOLD;
+    uint8_t curRight = ReadRightTape() < SENSOR_THRESHOLD;
 
     // Front
     if (curFront != lastFront) {
@@ -157,7 +157,7 @@ uint8_t TapeEventChecker(void) {
     } else {
         cntRight = 0;
     }
-
+    // printf("L=%d C=%d R=%d B=%d\n", curLeft, curFront, curRight, curRear);
     return returnVal;
 }
 
