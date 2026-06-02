@@ -38,6 +38,7 @@ uint8_t BumperEventChecker(void) {
             thisEvent.EventParam = curLeft;
             returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
+            printf("curLeft=%d\n", curLeft);
             PostBotHSM(thisEvent);
 #else
             SaveEvent(thisEvent);
@@ -78,8 +79,8 @@ uint8_t TapeEventChecker(void) {
     uint8_t returnVal = FALSE;
 
     uint8_t curFront = ReadFrontTape() < SENSOR_THRESHOLD;
-    uint8_t curRear = ReadRearTape()   > SENSOR_THRESHOLD;
-    uint8_t curLeft = ReadLeftTape()   > SENSOR_THRESHOLD;
+    uint8_t curRear = ReadRearTape()   < SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftTape()   < SENSOR_THRESHOLD;
     uint8_t curRight = ReadRightTape() < SENSOR_THRESHOLD;
 
     // Front

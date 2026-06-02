@@ -135,7 +135,7 @@ void ShootForward(int speed) {
     IO_PortsClearPortBits(PORTZ, RightShooterIN1);
     IO_PortsSetPortBits(PORTZ, RightShooterIN2);
 
-    PWM_SetDutyCycle(LeftShootMotorPWM, speed);
+    PWM_SetDutyCycle(LeftShootMotorPWM, speed - 50);
     PWM_SetDutyCycle(RightShootMotorPWM, speed);
 }
 
@@ -214,4 +214,27 @@ void TurnLeft(int speed) {
 
     PWM_SetDutyCycle(LeftDriveMotorPWM, speed);
     PWM_SetDutyCycle(RightDriveMotorPWM, 0);
+}
+
+
+void TurnBackLeft(int speed) {
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN1);
+    IO_PortsSetPortBits(PORTZ, LeftDriveIN2);
+
+    IO_PortsClearPortBits(PORTZ, RightDriveIN2);
+    IO_PortsClearPortBits(PORTZ, RightDriveIN1);
+
+    PWM_SetDutyCycle(LeftDriveMotorPWM, speed);
+    PWM_SetDutyCycle(RightDriveMotorPWM, 0);
+}
+
+void TurnBackRight(int speed) {
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN1);
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN2);
+
+    IO_PortsSetPortBits(PORTZ, RightDriveIN2);
+    IO_PortsClearPortBits(PORTZ, RightDriveIN1);
+
+    PWM_SetDutyCycle(LeftDriveMotorPWM, 0);
+    PWM_SetDutyCycle(RightDriveMotorPWM, speed);
 }

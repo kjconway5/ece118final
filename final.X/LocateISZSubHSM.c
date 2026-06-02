@@ -42,6 +42,8 @@ typedef enum {
     InitPSubState,
     FORWARD,
     FORWARD_OFF,
+    TURN_BACK_LEFT,
+    TURN_BACK_RIGHT,
     LCORNER,
     RCORNER,
     BUMPED,
@@ -52,6 +54,8 @@ static const char *StateNames[] = {
 	"InitPSubState",
 	"FORWARD",
     "FORWARD_OFF",
+    "TURN_BACK_LEFT",
+    "TURN_BACK_RIGHT",
     "LCORNER",
     "RCORNER",
     "BUMPED",
@@ -76,22 +80,20 @@ static TemplateSubHSMState_t CurrentState = InitPSubState; // <- change name to 
 static uint8_t MyPriority;
 
 // tape state tracking for combo detection
-static uint8_t frontTapeOn = 0;
-static uint8_t rightTapeOn = 0;
-static uint8_t leftTapeOn = 0;
 
 #define BACKUP_TIMER     5
-#define BACKUP_TIMER_MS  2000
+#define BACKUP_TIMER_MS  1000
 
 #define TANK_OBSTACLE     6
-#define TANK_OBSTACLE_MS  2000
+#define TANK_OBSTACLE_MS  1500
 
 #define CROSSING_TIMER     7
-#define CROSSING_TIMER_MS  2000
+#define CROSSING_TIMER_MS  4000
 
 #define CORNER_TIMER     8
-#define CORNER_TIMER_MS  2000
+#define CORNER_TIMER_MS  1250
 
+static uint8_t crossLeft = TRUE;
 static uint8_t ignoreTape = FALSE;
 
 
@@ -145,267 +147,304 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
+        case InitPSubState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
 
-            // now put the machine into the actual initial state
-            nextState = FORWARD;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-
-    case FORWARD: // in the first state, replace this with correct names
-        
-        switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                printf("In FORWARD\n");
-                DriveForward(500);
-                leftTapeOn = 0;
-                frontTapeOn = 0;
-                rightTapeOn = 0;
-                break;
-            case ES_EXIT:
-                StopDriving();
-                break;
-
-            case LEFT_TAPE_ON:
-                leftTapeOn = 1;
-                break;
-            case LEFT_TAPE_OFF:
-                leftTapeOn = 0;
-                break;
-            case FRONT_TAPE_ON:
-                frontTapeOn = 1;
-                nextState = FORWARD_OFF;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-            case FRONT_TAPE_OFF:
-                frontTapeOn = 0;
-                break;
-            case RIGHT_TAPE_ON:
-                rightTapeOn = 1;
-                break;
-            case RIGHT_TAPE_OFF:
-                rightTapeOn = 0;
-                break;
-
-            case RIGHT_BUMPER_PRESSED:
-                nextState = BUMPED;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            case LEFT_BUMPER_PRESSED:
-                nextState = BUMPED;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-
-            case ES_NO_EVENT:
-            default: // all unhandled events pass the event back up to the next level
-                break;
-            }
-
-            // CHECK COMBINATIONS HERE
-            if (frontTapeOn && leftTapeOn) {
-                printf("LCORNER\n");
-                nextState = LCORNER;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            } else if (frontTapeOn && rightTapeOn) {
-                printf("RCORNER\n");
-                nextState = RCORNER;
+                // now put the machine into the actual initial state
+                nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-    case BUMPED: 
-        switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                printf("In BUMPED state\n");
-                DriveBackward(500);
-                ES_Timer_InitTimer(BACKUP_TIMER, BACKUP_TIMER_MS);
-                break;
+        case FORWARD: // in the first state, replace this with correct names
+            
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In FORWARD\n");
+                    DriveForward(600);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
 
-            case ES_EXIT:
-                StopDriving();
-                break;
-
-            case ES_TIMEOUT:
-                if (ThisEvent.EventParam == BACKUP_TIMER) {
-                    TankLeft(500);
-                    ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
-                }
-
-                if (ThisEvent.EventParam == TANK_OBSTACLE) {
-                    nextState = CROSSING;
+                // case LEFT_TAPE_ON:
+                //     nextState = LCORNER;
+                //     makeTransition = TRUE;
+                //     ThisEvent.EventType = ES_NO_EVENT;
+                //     break;
+    
+                case FRONT_TAPE_ON:
+                    nextState = FORWARD_OFF;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case RIGHT_TAPE_ON:
+                    nextState = RCORNER;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case RIGHT_BUMPER_PRESSED:
+                    nextState = BUMPED;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case LEFT_BUMPER_PRESSED:
+                    nextState = BUMPED;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case ES_NO_EVENT:
+                default: // all unhandled events pass the event back up to the next level
+                    break;
                 }
+            break;
+
+        case BUMPED: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In BUMPED state\n");
+                    DriveBackward(500);
+                    ES_Timer_InitTimer(BACKUP_TIMER, BACKUP_TIMER_MS);
+                    break;
+
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == BACKUP_TIMER) {
+                        if (crossLeft == TRUE) {
+                            crossLeft = FALSE;
+                            TankLeft(500);
+                        } else {
+                            crossLeft = TRUE;
+                            TankRight(500);
+                        }
+                        ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                    }
+
+                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                        nextState = CROSSING;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
 
 
-                break;
+                    break;
 
-            // case LEFT_BUMPER_RELEASED:
-            //     nextState = FORWARD;
-            //     makeTransition = TRUE;
-            //     ThisEvent.EventType = ES_NO_EVENT;
-            //     break;
+        //         // case LEFT_BUMPER_RELEASED:
+        //         //     nextState = FORWARD;
+        //         //     makeTransition = TRUE;
+        //         //     ThisEvent.EventType = ES_NO_EVENT;
+        //         //     break;
 
-            // case RIGHT_BUMPER_RELEASED:
-            //     nextState = FORWARD;
-            //     makeTransition = TRUE;
-            //     ThisEvent.EventType = ES_NO_EVENT;
-            //     break;
+        //         // case RIGHT_BUMPER_RELEASED:
+        //         //     nextState = FORWARD;
+        //         //     makeTransition = TRUE;
+        //         //     ThisEvent.EventType = ES_NO_EVENT;
+        //         //     break;
+
+
+                case ES_NO_EVENT:
+                default:
+                    break;
+
+            }
+            break;
+        
+        case CROSSING:
+            switch (ThisEvent.EventType) {
+
+                case ES_ENTRY:
+                    printf("In CROSSING state\n");
+                    ignoreTape = TRUE;
+                    DriveForward(500);
+                    ES_Timer_InitTimer(CROSSING_TIMER, CROSSING_TIMER_MS);
+                    break;
+
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == CROSSING_TIMER) {
+                        // StopDriving();
+                        ignoreTape = FALSE;
+                        // TankRight(500);
+                        // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                    }
+                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                        StopDriving();
+                        // nextState = FORWARD;
+                        // makeTransition = TRUE;
+                        // ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+
+                case FRONT_TAPE_ON:
+                case FRONT_TAPE_OFF:
+                case LEFT_TAPE_ON:
+                case LEFT_TAPE_OFF:
+                case RIGHT_TAPE_ON:
+                case RIGHT_TAPE_OFF:
+                case REAR_TAPE_ON:
+                case REAR_TAPE_OFF:
+
+                    if (ignoreTape == TRUE) {
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else {
+                        // handle tape normally here
+                        if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                            // nextState = FORWARD;
+                            // makeTransition = TRUE;
+                            // ThisEvent.EventType = ES_NO_EVENT;
+                            TankRight(500);
+                            ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                        }
+                    }
+                    break;
 
 
             case ES_NO_EVENT:
             default:
                 break;
-
         }
         break;
-    
-    case CROSSING:
-        switch (ThisEvent.EventType) {
+        
+        case RCORNER: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In RCORNER state\n");
+                    ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
+                    TurnLeft(500);
+                    break;
+                
+                case ES_EXIT:
+                    StopDriving();
+                    break;
 
-            case ES_ENTRY:
-                printf("In CROSSING state\n");
-                ignoreTape = TRUE;
-                DriveForward(500);
-                ES_Timer_InitTimer(CROSSING_TIMER, CROSSING_TIMER_MS);
-                break;
-
-            case ES_TIMEOUT:
-                if (ThisEvent.EventParam == CROSSING_TIMER) {
-                    ignoreTape = FALSE;
-                    TankRight(500);
-                    ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
-                }
-                if (ThisEvent.EventParam == TANK_OBSTACLE) {
-                    nextState = FORWARD;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                }
-                break;
-
-            case FRONT_TAPE_ON:
-            case FRONT_TAPE_OFF:
-            case LEFT_TAPE_ON:
-            case LEFT_TAPE_OFF:
-            case RIGHT_TAPE_ON:
-            case RIGHT_TAPE_OFF:
-            case REAR_TAPE_ON:
-            case REAR_TAPE_OFF:
-
-                if (ignoreTape == TRUE) {
-                    ThisEvent.EventType = ES_NO_EVENT;
-                } else {
-                    // handle tape normally here
-                    if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == CORNER_TIMER) {
                         nextState = FORWARD;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                     }
-                }
-                break;
+                    break;
+                
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
 
-
-        case ES_NO_EVENT:
-        default:
             break;
-    }
-    break;
-    
-    case RCORNER: 
-        switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                printf("In RCORNER state\n");
-                ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
-                TurnRight(500);
-                break;
-            
-            case ES_EXIT:
-                StopDriving();
-                break;
 
-            case ES_TIMEOUT:
-                if (ThisEvent.EventParam == CORNER_TIMER) {
+        // case LCORNER: 
+        //     switch (ThisEvent.EventType) {
+        //         case ES_ENTRY:
+        //             printf("In LCORNER state\n");
+        //             ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
+        //             TurnLeft(500);
+        //             break;
+                
+        //         case ES_EXIT:
+        //             StopDriving();
+        //             break;
+
+        //         case ES_TIMEOUT:
+        //             if (ThisEvent.EventParam == CORNER_TIMER) {
+        //                 nextState = FORWARD;
+        //                 makeTransition = TRUE;
+        //                 ThisEvent.EventType = ES_NO_EVENT;
+        //             }
+        //             break;
+                
+        //         case ES_NO_EVENT:
+        //         default:
+        //             break;
+        //     }
+
+        //     break;
+
+        case FORWARD_OFF: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In FORWARD_OFF state\n");
+                    DriveForward(600);
+                    //StopDriving();
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case RIGHT_TAPE_ON:
+                    nextState = TURN_BACK_RIGHT;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case LEFT_TAPE_ON:
+                    nextState = TURN_BACK_LEFT;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+            break;
+
+        case TURN_BACK_LEFT:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In TURN_BACK_LEFT state\n");
+                    TurnBackRight(600);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case FRONT_TAPE_ON:
                     nextState = FORWARD;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
-                }
-                break;
-            
-            case ES_NO_EVENT:
-            default:
-                break;
-        }
+                    break;
 
-        break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+            break;
 
-    case LCORNER: 
-        switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                printf("In LCORNER state\n");
-                ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
-                TurnLeft(500);
-                break;
-            
-            case ES_EXIT:
-                StopDriving();
-                break;
+        case TURN_BACK_RIGHT:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In TURN_BACK_RIGHT state\n");
+                    TurnBackLeft(600);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
 
-            case ES_TIMEOUT:
-                if (ThisEvent.EventParam == CORNER_TIMER) {
+                case FRONT_TAPE_ON:
                     nextState = FORWARD;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
-                }
-                break;
-            
-            case ES_NO_EVENT:
-            default:
-                break;
-        }
+                    break;
 
-        break;
-
-    case FORWARD_OFF: 
-        switch (ThisEvent.EventType) {
-            case ES_ENTRY:
-                printf("In FORWARD_OFF state\n");
-                DriveForward(500);
-                break;
-            case ES_EXIT:
-                StopDriving();
-                break;
-
-            case RIGHT_TAPE_ON:
-                TurnRight(500);
-                break;
-
-            case LEFT_TAPE_ON:
-                TurnLeft(500);
-                break;
-
-            case FRONT_TAPE_ON:
-                nextState = FORWARD;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                break;
-        }
-        break;
-    default: // all unhandled states fall into here
-        break;
-    } // end switch on Current State
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+            break;
+        default: // all unhandled states fall into here
+            break;
+        } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event

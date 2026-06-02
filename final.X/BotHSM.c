@@ -179,17 +179,17 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             //NOTE: the SubState Machine runs and responds to events before anything in the this
             //state machine does
             ThisEvent = RunLocateISZSubHSM(ThisEvent);
-            switch (ThisEvent.EventType) {
-                case MOVE_TO_SHOOTING:
-                    nextState = LocateISZ;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case ES_NO_EVENT:
-                default:
-                    break;
+            // switch (ThisEvent.EventType) {
+            //     case MOVE_TO_SHOOTING:
+            //         nextState = LocateISZ;
+            //         makeTransition = TRUE;
+            //         ThisEvent.EventType = ES_NO_EVENT;
+            //         break;
+            //     case ES_NO_EVENT:
+            //     default:
+            //         break;
 
-            }
+            // }
 //        case InISZ: // in the first state, replace this with correct names
 //            // run sub-state machine for this state
 //            //NOTE: the SubState Machine runs and responds to events before anything in the this
