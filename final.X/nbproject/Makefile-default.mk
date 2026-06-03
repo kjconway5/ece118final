@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../ECE118/src/AD.c ../ECE118/src/BOARD.c ../ECE118/src/ES_CheckEvents.c ../ECE118/src/ES_Framework.c ../ECE118/src/ES_KeyboardInput.c ../ECE118/src/ES_PostList.c ../ECE118/src/ES_Queue.c ../ECE118/src/ES_TattleTale.c ../ECE118/src/ES_Timers.c ../ECE118/src/IO_Ports.c ../ECE118/src/LED.c ../ECE118/src/pwm.c ../ECE118/src/RC_Servo.c ../ECE118/src/serial.c ../ECE118/src/timers.c BallService.c BotHSM.c EventChecker.c LocateISZSubHSM.c sensormotor.c TemplateES_Main.c
+SOURCEFILES_QUOTED_IF_SPACED=../ECE118/src/AD.c ../ECE118/src/BOARD.c ../ECE118/src/ES_CheckEvents.c ../ECE118/src/ES_Framework.c ../ECE118/src/ES_KeyboardInput.c ../ECE118/src/ES_PostList.c ../ECE118/src/ES_Queue.c ../ECE118/src/ES_TattleTale.c ../ECE118/src/ES_Timers.c ../ECE118/src/IO_Ports.c ../ECE118/src/LED.c ../ECE118/src/pwm.c ../ECE118/src/RC_Servo.c ../ECE118/src/serial.c ../ECE118/src/timers.c BallService.c BotHSM.c EventChecker.c InISZSubHSM.c LocateISZSubHSM.c sensormotor.c StartingSubHSM.c TemplateES_Main.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1347132459/AD.o ${OBJECTDIR}/_ext/1347132459/BOARD.o ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o ${OBJECTDIR}/_ext/1347132459/ES_Framework.o ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1347132459/ES_PostList.o ${OBJECTDIR}/_ext/1347132459/ES_Queue.o ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o ${OBJECTDIR}/_ext/1347132459/ES_Timers.o ${OBJECTDIR}/_ext/1347132459/IO_Ports.o ${OBJECTDIR}/_ext/1347132459/LED.o ${OBJECTDIR}/_ext/1347132459/pwm.o ${OBJECTDIR}/_ext/1347132459/RC_Servo.o ${OBJECTDIR}/_ext/1347132459/serial.o ${OBJECTDIR}/_ext/1347132459/timers.o ${OBJECTDIR}/BallService.o ${OBJECTDIR}/BotHSM.o ${OBJECTDIR}/EventChecker.o ${OBJECTDIR}/LocateISZSubHSM.o ${OBJECTDIR}/sensormotor.o ${OBJECTDIR}/TemplateES_Main.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1347132459/AD.o.d ${OBJECTDIR}/_ext/1347132459/BOARD.o.d ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o.d ${OBJECTDIR}/_ext/1347132459/ES_Framework.o.d ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o.d ${OBJECTDIR}/_ext/1347132459/ES_PostList.o.d ${OBJECTDIR}/_ext/1347132459/ES_Queue.o.d ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o.d ${OBJECTDIR}/_ext/1347132459/ES_Timers.o.d ${OBJECTDIR}/_ext/1347132459/IO_Ports.o.d ${OBJECTDIR}/_ext/1347132459/LED.o.d ${OBJECTDIR}/_ext/1347132459/pwm.o.d ${OBJECTDIR}/_ext/1347132459/RC_Servo.o.d ${OBJECTDIR}/_ext/1347132459/serial.o.d ${OBJECTDIR}/_ext/1347132459/timers.o.d ${OBJECTDIR}/BallService.o.d ${OBJECTDIR}/BotHSM.o.d ${OBJECTDIR}/EventChecker.o.d ${OBJECTDIR}/LocateISZSubHSM.o.d ${OBJECTDIR}/sensormotor.o.d ${OBJECTDIR}/TemplateES_Main.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1347132459/AD.o ${OBJECTDIR}/_ext/1347132459/BOARD.o ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o ${OBJECTDIR}/_ext/1347132459/ES_Framework.o ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1347132459/ES_PostList.o ${OBJECTDIR}/_ext/1347132459/ES_Queue.o ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o ${OBJECTDIR}/_ext/1347132459/ES_Timers.o ${OBJECTDIR}/_ext/1347132459/IO_Ports.o ${OBJECTDIR}/_ext/1347132459/LED.o ${OBJECTDIR}/_ext/1347132459/pwm.o ${OBJECTDIR}/_ext/1347132459/RC_Servo.o ${OBJECTDIR}/_ext/1347132459/serial.o ${OBJECTDIR}/_ext/1347132459/timers.o ${OBJECTDIR}/BallService.o ${OBJECTDIR}/BotHSM.o ${OBJECTDIR}/EventChecker.o ${OBJECTDIR}/InISZSubHSM.o ${OBJECTDIR}/LocateISZSubHSM.o ${OBJECTDIR}/sensormotor.o ${OBJECTDIR}/StartingSubHSM.o ${OBJECTDIR}/TemplateES_Main.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1347132459/AD.o.d ${OBJECTDIR}/_ext/1347132459/BOARD.o.d ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o.d ${OBJECTDIR}/_ext/1347132459/ES_Framework.o.d ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o.d ${OBJECTDIR}/_ext/1347132459/ES_PostList.o.d ${OBJECTDIR}/_ext/1347132459/ES_Queue.o.d ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o.d ${OBJECTDIR}/_ext/1347132459/ES_Timers.o.d ${OBJECTDIR}/_ext/1347132459/IO_Ports.o.d ${OBJECTDIR}/_ext/1347132459/LED.o.d ${OBJECTDIR}/_ext/1347132459/pwm.o.d ${OBJECTDIR}/_ext/1347132459/RC_Servo.o.d ${OBJECTDIR}/_ext/1347132459/serial.o.d ${OBJECTDIR}/_ext/1347132459/timers.o.d ${OBJECTDIR}/BallService.o.d ${OBJECTDIR}/BotHSM.o.d ${OBJECTDIR}/EventChecker.o.d ${OBJECTDIR}/InISZSubHSM.o.d ${OBJECTDIR}/LocateISZSubHSM.o.d ${OBJECTDIR}/sensormotor.o.d ${OBJECTDIR}/StartingSubHSM.o.d ${OBJECTDIR}/TemplateES_Main.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1347132459/AD.o ${OBJECTDIR}/_ext/1347132459/BOARD.o ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o ${OBJECTDIR}/_ext/1347132459/ES_Framework.o ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1347132459/ES_PostList.o ${OBJECTDIR}/_ext/1347132459/ES_Queue.o ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o ${OBJECTDIR}/_ext/1347132459/ES_Timers.o ${OBJECTDIR}/_ext/1347132459/IO_Ports.o ${OBJECTDIR}/_ext/1347132459/LED.o ${OBJECTDIR}/_ext/1347132459/pwm.o ${OBJECTDIR}/_ext/1347132459/RC_Servo.o ${OBJECTDIR}/_ext/1347132459/serial.o ${OBJECTDIR}/_ext/1347132459/timers.o ${OBJECTDIR}/BallService.o ${OBJECTDIR}/BotHSM.o ${OBJECTDIR}/EventChecker.o ${OBJECTDIR}/LocateISZSubHSM.o ${OBJECTDIR}/sensormotor.o ${OBJECTDIR}/TemplateES_Main.o
+OBJECTFILES=${OBJECTDIR}/_ext/1347132459/AD.o ${OBJECTDIR}/_ext/1347132459/BOARD.o ${OBJECTDIR}/_ext/1347132459/ES_CheckEvents.o ${OBJECTDIR}/_ext/1347132459/ES_Framework.o ${OBJECTDIR}/_ext/1347132459/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1347132459/ES_PostList.o ${OBJECTDIR}/_ext/1347132459/ES_Queue.o ${OBJECTDIR}/_ext/1347132459/ES_TattleTale.o ${OBJECTDIR}/_ext/1347132459/ES_Timers.o ${OBJECTDIR}/_ext/1347132459/IO_Ports.o ${OBJECTDIR}/_ext/1347132459/LED.o ${OBJECTDIR}/_ext/1347132459/pwm.o ${OBJECTDIR}/_ext/1347132459/RC_Servo.o ${OBJECTDIR}/_ext/1347132459/serial.o ${OBJECTDIR}/_ext/1347132459/timers.o ${OBJECTDIR}/BallService.o ${OBJECTDIR}/BotHSM.o ${OBJECTDIR}/EventChecker.o ${OBJECTDIR}/InISZSubHSM.o ${OBJECTDIR}/LocateISZSubHSM.o ${OBJECTDIR}/sensormotor.o ${OBJECTDIR}/StartingSubHSM.o ${OBJECTDIR}/TemplateES_Main.o
 
 # Source Files
-SOURCEFILES=../ECE118/src/AD.c ../ECE118/src/BOARD.c ../ECE118/src/ES_CheckEvents.c ../ECE118/src/ES_Framework.c ../ECE118/src/ES_KeyboardInput.c ../ECE118/src/ES_PostList.c ../ECE118/src/ES_Queue.c ../ECE118/src/ES_TattleTale.c ../ECE118/src/ES_Timers.c ../ECE118/src/IO_Ports.c ../ECE118/src/LED.c ../ECE118/src/pwm.c ../ECE118/src/RC_Servo.c ../ECE118/src/serial.c ../ECE118/src/timers.c BallService.c BotHSM.c EventChecker.c LocateISZSubHSM.c sensormotor.c TemplateES_Main.c
+SOURCEFILES=../ECE118/src/AD.c ../ECE118/src/BOARD.c ../ECE118/src/ES_CheckEvents.c ../ECE118/src/ES_Framework.c ../ECE118/src/ES_KeyboardInput.c ../ECE118/src/ES_PostList.c ../ECE118/src/ES_Queue.c ../ECE118/src/ES_TattleTale.c ../ECE118/src/ES_Timers.c ../ECE118/src/IO_Ports.c ../ECE118/src/LED.c ../ECE118/src/pwm.c ../ECE118/src/RC_Servo.c ../ECE118/src/serial.c ../ECE118/src/timers.c BallService.c BotHSM.c EventChecker.c InISZSubHSM.c LocateISZSubHSM.c sensormotor.c StartingSubHSM.c TemplateES_Main.c
 
 
 
@@ -209,6 +209,12 @@ ${OBJECTDIR}/EventChecker.o: EventChecker.c  .generated_files/flags/default/76e2
 	@${RM} ${OBJECTDIR}/EventChecker.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/EventChecker.o.d" -o ${OBJECTDIR}/EventChecker.o EventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
+${OBJECTDIR}/InISZSubHSM.o: InISZSubHSM.c  .generated_files/flags/default/20688d78921128921fae8b63b42053651f5c5ab5 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/InISZSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/InISZSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/InISZSubHSM.o.d" -o ${OBJECTDIR}/InISZSubHSM.o InISZSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/LocateISZSubHSM.o: LocateISZSubHSM.c  .generated_files/flags/default/7cb099e2038fcb48a0d00bc4af34edc979575ed7 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/LocateISZSubHSM.o.d 
@@ -220,6 +226,12 @@ ${OBJECTDIR}/sensormotor.o: sensormotor.c  .generated_files/flags/default/27d849
 	@${RM} ${OBJECTDIR}/sensormotor.o.d 
 	@${RM} ${OBJECTDIR}/sensormotor.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/sensormotor.o.d" -o ${OBJECTDIR}/sensormotor.o sensormotor.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/StartingSubHSM.o: StartingSubHSM.c  .generated_files/flags/default/5e12a4a5a1af1e364d39500728499fe63a52adf4 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/StartingSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/StartingSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/StartingSubHSM.o.d" -o ${OBJECTDIR}/StartingSubHSM.o StartingSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/TemplateES_Main.o: TemplateES_Main.c  .generated_files/flags/default/45bb081137eaac1cd8115a32440b9972244b9e3a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
@@ -336,6 +348,12 @@ ${OBJECTDIR}/EventChecker.o: EventChecker.c  .generated_files/flags/default/428b
 	@${RM} ${OBJECTDIR}/EventChecker.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/EventChecker.o.d" -o ${OBJECTDIR}/EventChecker.o EventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
+${OBJECTDIR}/InISZSubHSM.o: InISZSubHSM.c  .generated_files/flags/default/9396b67148ef3c7339e455a37c1e84a1149c3367 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/InISZSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/InISZSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/InISZSubHSM.o.d" -o ${OBJECTDIR}/InISZSubHSM.o InISZSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
 ${OBJECTDIR}/LocateISZSubHSM.o: LocateISZSubHSM.c  .generated_files/flags/default/6d184ce372ddddd5ba2715dc5cdf1144829f448c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/LocateISZSubHSM.o.d 
@@ -347,6 +365,12 @@ ${OBJECTDIR}/sensormotor.o: sensormotor.c  .generated_files/flags/default/15a9b8
 	@${RM} ${OBJECTDIR}/sensormotor.o.d 
 	@${RM} ${OBJECTDIR}/sensormotor.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/sensormotor.o.d" -o ${OBJECTDIR}/sensormotor.o sensormotor.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/StartingSubHSM.o: StartingSubHSM.c  .generated_files/flags/default/7e18c32d19344b267d347179e8c49f5ee1731409 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/StartingSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/StartingSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -fdata-sections -O1 -fno-common -I"." -I"../ECE118/include" -MP -MMD -MF "${OBJECTDIR}/StartingSubHSM.o.d" -o ${OBJECTDIR}/StartingSubHSM.o StartingSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/TemplateES_Main.o: TemplateES_Main.c  .generated_files/flags/default/7c2d815211eabe3affef9af0b34f605d164c36bc .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 

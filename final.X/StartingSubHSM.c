@@ -49,6 +49,7 @@ typedef enum {
     RightFirst,
     RightSecond,
     RightThird,
+    Aligned3,
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
@@ -62,6 +63,7 @@ static const char *StateNames[] = {
 	"RightFirst",
 	"RightSecond",
 	"RightThird",
+	"Aligned3",
 };
 
 
@@ -81,7 +83,9 @@ static const char *StateNames[] = {
 static StartingSubHSMState_t CurrentState = InitPSubState; // <- change name to match ENUM
 static uint8_t MyPriority;
 
-
+#define INITTIMER 6
+#define TIMERSEC 1000
+#define TIMERSEC2 10000
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
@@ -135,11 +139,18 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 // this is where you would put any actions associated with the
                 // transition from the initial pseudo-state into the actual
                 // initial state
-
+                ES_Timer_InitTimer(INITTIMER, TIMERSEC);
                 // now put the machine into the actual initial state
-                nextState = Spinning;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT) {
+                if (ThisEvent.EventParam == INITTIMER) {
+                    nextState = Spinning;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+            }
+            if (ThisEvent.EventType == BEACON_DETECTED) {
+                ThisEvent.EventType = ES_NO_EVENT; // swallow it
             }
             break;
 
@@ -150,12 +161,12 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == BEACON_DETECTED)// only respond to ES_Init
-            {
+            if (ThisEvent.EventType == BEACON_DETECTED) {
                 nextState = MoveForward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("Spinning to MoveForward\n");
+
             }
             break;
         case MoveForward: // in the first state, replace this with appropriate state
@@ -224,10 +235,13 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             break;
         case Aligned2: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
-                ES_Event moveEvent;
-                moveEvent.EventType = MOVE_TO_LOCATE;
-                moveEvent.EventParam = 0;
-                PostBotHSM(moveEvent);
+                TurnBackLeft(500);
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = Aligned3;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("RightTape to \n");
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
@@ -276,6 +290,18 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 printf("LeftTape to RightTape\n");
             }
             break;
+        case Aligned3: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Event moveEvent;
+                moveEvent.EventType = MOVE_TO_LOCATE;
+                moveEvent.EventParam = 0;
+                PostBotHSM(moveEvent);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            break;
+
         default: // all unhandled states fall into here
             break;
     } // end switch on Current State
@@ -295,4 +321,3 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
-

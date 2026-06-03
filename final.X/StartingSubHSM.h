@@ -72,4 +72,3 @@ uint8_t InitStartingSubHSM(void);
 ES_Event RunStartingSubHSM(ES_Event ThisEvent);
 
 #endif /* SUB_HSM_Template_H */
-

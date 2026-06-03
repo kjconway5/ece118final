@@ -166,19 +166,19 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("In FORWARD\n");
-                    DriveForward(600);
+                    DriveForward(500);
                     break;
                 case ES_EXIT:
                     StopDriving();
                     break;
 
-                // case LEFT_TAPE_ON:
-                //     nextState = LCORNER;
-                //     makeTransition = TRUE;
-                //     ThisEvent.EventType = ES_NO_EVENT;
-                //     break;
+                case LEFT_TAPE_ON:
+                    nextState = LCORNER;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
     
-                case FRONT_TAPE_ON:
+                case FRONT_TAPE_OFF:
                     nextState = FORWARD_OFF;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -224,10 +224,10 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
                     if (ThisEvent.EventParam == BACKUP_TIMER) {
                         if (crossLeft == TRUE) {
                             crossLeft = FALSE;
-                            TankLeft(500);
+                            TankRight(500); // needs t0 be changed 
                         } else {
                             crossLeft = TRUE;
-                            TankRight(500);
+                            TankLeft(500);
                         }
                         ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
                     }
@@ -240,19 +240,6 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
 
 
                     break;
-
-        //         // case LEFT_BUMPER_RELEASED:
-        //         //     nextState = FORWARD;
-        //         //     makeTransition = TRUE;
-        //         //     ThisEvent.EventType = ES_NO_EVENT;
-        //         //     break;
-
-        //         // case RIGHT_BUMPER_RELEASED:
-        //         //     nextState = FORWARD;
-        //         //     makeTransition = TRUE;
-        //         //     ThisEvent.EventType = ES_NO_EVENT;
-        //         //     break;
-
 
                 case ES_NO_EVENT:
                 default:
@@ -320,8 +307,9 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("In RCORNER state\n");
-                    ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
-                    TurnLeft(500);
+                    StopDriving();
+                    // ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
+                    // TurnLeft(500);
                     break;
                 
                 case ES_EXIT:
@@ -343,38 +331,39 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
 
             break;
 
-        // case LCORNER: 
-        //     switch (ThisEvent.EventType) {
-        //         case ES_ENTRY:
-        //             printf("In LCORNER state\n");
-        //             ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
-        //             TurnLeft(500);
-        //             break;
+        case LCORNER: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    printf("In LCORNER state\n");
+                    StopDriving();
+                    // ES_Timer_InitTimer(CORNER_TIMER, CORNER_TIMER_MS);
+                    // TurnLeft(500);
+                    break;
                 
-        //         case ES_EXIT:
-        //             StopDriving();
-        //             break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
 
-        //         case ES_TIMEOUT:
-        //             if (ThisEvent.EventParam == CORNER_TIMER) {
-        //                 nextState = FORWARD;
-        //                 makeTransition = TRUE;
-        //                 ThisEvent.EventType = ES_NO_EVENT;
-        //             }
-        //             break;
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == CORNER_TIMER) {
+                        nextState = FORWARD;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
                 
-        //         case ES_NO_EVENT:
-        //         default:
-        //             break;
-        //     }
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
 
-        //     break;
+            break;
 
         case FORWARD_OFF: 
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("In FORWARD_OFF state\n");
-                    DriveForward(600);
+                    DriveForward(500);
                     //StopDriving();
                     break;
                 case ES_EXIT:
@@ -403,7 +392,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("In TURN_BACK_LEFT state\n");
-                    TurnBackRight(600);
+                    TurnBackRight(500);
                     break;
                 case ES_EXIT:
                     StopDriving();
@@ -425,7 +414,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent)
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("In TURN_BACK_RIGHT state\n");
-                    TurnBackLeft(600);
+                    TurnBackLeft(500);
                     break;
                 case ES_EXIT:
                     StopDriving();

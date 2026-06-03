@@ -134,7 +134,7 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     BotHSMState_t nextState; // <- change type to correct enum
 
-    // ES_Tattle(); // trace call stack
+    ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
         case InitPState: // If current state is initial Pseudo State
@@ -144,64 +144,67 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
                 // transition from the initial pseudo-state into the actual
                 // initial state
                 // Initialize all sub-state machines
-                // InitStartingSubHSM();
-                InitLocateISZSubHSM();
-                // InitInISZSubHSM();
+                InitStartingSubHSM();
+                //InitInISZSubHSM();
+                //InitLocateISZSubHSM();
                 // now put the machine into the actual initial state
-                //  nextState = Starting;
-                nextState = LocateISZ;
-                // nextState = InISZ;
+                nextState = Starting;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
             }
             break;
 
-//        case Starting: // in the first state, replace this with correct names
-//            // run sub-state machine for this state
-//            //NOTE: the SubState Machine runs and responds to events before anything in the this
-//            //state machine does
-//            ThisEvent = RunStartingSubHSM(ThisEvent);
-//            switch (ThisEvent.EventType) {
-//                case MOVE_TO_LOCATE:
-//                    nextState = LocateISZ;
-//                    makeTransition = TRUE;
-//                    ThisEvent.EventType = ES_NO_EVENT;
-//                    break;
-//                case ES_NO_EVENT:
-//                default:
-//                    break;
-//
-//            }
-//            break;
+        case Starting: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            ThisEvent = RunStartingSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
+               case MOVE_TO_LOCATE:
+                   InitLocateISZSubHSM();
+                   nextState = LocateISZ;
+                   makeTransition = TRUE;
+                   ThisEvent.EventType = ES_NO_EVENT;
+                   break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+
+            }
+            break;
         case LocateISZ: // in the first state, replace this with correct names
             // run sub-state machine for this state
             //NOTE: the SubState Machine runs and responds to events before anything in the this
             //state machine does
             ThisEvent = RunLocateISZSubHSM(ThisEvent);
-            // switch (ThisEvent.EventType) {
-            //     case MOVE_TO_SHOOTING:
-            //         nextState = LocateISZ;
-            //         makeTransition = TRUE;
-            //         ThisEvent.EventType = ES_NO_EVENT;
-            //         break;
-            //     case ES_NO_EVENT:
-            //     default:
-            //         break;
+            switch (ThisEvent.EventType) {
+                // case MOVE_TO_SHOOTING:
+                //     nextState = InISZ;
+                //     makeTransition = TRUE;
+                //     ThisEvent.EventType = ES_NO_EVENT;
+                //     break;
+                case ES_EXIT:
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
 
-            // }
-//        case InISZ: // in the first state, replace this with correct names
-//            // run sub-state machine for this state
-//            //NOTE: the SubState Machine runs and responds to events before anything in the this
-//            //state machine does
-//            ThisEvent = RunInISZSubHSM(ThisEvent);
-//            switch (ThisEvent.EventType) {
-//                case ES_NO_EVENT:
-//                default:
-//                    break;
-//
-//            }
-//            break;
+            }
+            break;
+        case InISZ: // in the first state, replace this with correct names
+            // run sub-state machine for this state
+            //NOTE: the SubState Machine runs and responds to events before anything in the this
+            //state machine does
+            
+            ThisEvent = RunInISZSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case ES_NO_EVENT:
+                default:
+                    break;
+
+            }
+            break;
         default: // all unhandled states fall into here
             break;
     } // end switch on Current State
@@ -213,7 +216,7 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
         RunBotHSM(ENTRY_EVENT); // <- rename to your own Run function
     }
 
-    // ES_Tail(); // trace call stack end
+    ES_Tail(); // trace call stack end
     return ThisEvent;
 }
 

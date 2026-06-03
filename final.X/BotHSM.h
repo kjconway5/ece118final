@@ -87,4 +87,3 @@ uint8_t PostBotHSM(ES_Event ThisEvent);
 ES_Event RunBotHSM(ES_Event ThisEvent);
 
 #endif /* HSM_Template_H */
-

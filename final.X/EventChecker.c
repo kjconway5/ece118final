@@ -78,10 +78,10 @@ uint8_t TapeEventChecker(void) {
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
-    uint8_t curFront = ReadFrontTape() < SENSOR_THRESHOLD;
-    uint8_t curRear = ReadRearTape()   < SENSOR_THRESHOLD;
-    uint8_t curLeft = ReadLeftTape()   < SENSOR_THRESHOLD;
-    uint8_t curRight = ReadRightTape() < SENSOR_THRESHOLD;
+    uint8_t curFront = ReadFrontTape() > SENSOR_THRESHOLD;
+    uint8_t curRear = ReadRearTape()   > SENSOR_THRESHOLD;
+    uint8_t curLeft = ReadLeftTape()   > SENSOR_THRESHOLD;
+    uint8_t curRight = ReadRightTape() > SENSOR_THRESHOLD;
 
     // Front
     if (curFront != lastFront) {
@@ -158,6 +158,31 @@ uint8_t TapeEventChecker(void) {
     } else {
         cntRight = 0;
     }
+
+    // After all debounce logic
+
+    if (lastFront && lastRight) {
+        thisEvent.EventType = FRONT_RIGHT_TAPE;
+        thisEvent.EventParam = 0;
+        returnVal = TRUE;
+    #ifndef EVENTCHECKER_TEST
+        PostBotHSM(thisEvent);
+    #else
+        SaveEvent(thisEvent);
+    #endif
+    }
+
+    if (lastFront && lastLeft) {
+        thisEvent.EventType = FRONT_LEFT_TAPE;
+        thisEvent.EventParam = 0;
+        returnVal = TRUE;
+    #ifndef EVENTCHECKER_TEST
+        PostBotHSM(thisEvent);
+    #else
+        SaveEvent(thisEvent);
+    #endif
+    }
+
     // printf("L=%d C=%d R=%d B=%d\n", curLeft, curFront, curRight, curRear);
     return returnVal;
 }
