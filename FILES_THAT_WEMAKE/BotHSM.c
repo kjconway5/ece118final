@@ -144,13 +144,11 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
                 // transition from the initial pseudo-state into the actual
                 // initial state
                 // Initialize all sub-state machines
-                //InitStartingSubHSM();
+                InitStartingSubHSM();
                 //InitInISZSubHSM();
-                InitLocateISZSubHSM();
+                //InitLocateISZSubHSM();
                 // now put the machine into the actual initial state
-//                nextState = Starting;
-                nextState = LocateISZ;
-//                nextState = InISZ;
+                nextState = Starting;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -164,6 +162,7 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             ThisEvent = RunStartingSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case MOVE_TO_LOCATE:
+                    InitLocateISZSubHSM();
                     nextState = LocateISZ;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -181,9 +180,12 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             ThisEvent = RunLocateISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case MOVE_TO_SHOOTING:
-                    nextState = LocateISZ;
+                    nextState = InISZ;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_EXIT:
+                    break;
                 case ES_NO_EVENT:
                 default:
                     break;
@@ -194,6 +196,7 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             // run sub-state machine for this state
             //NOTE: the SubState Machine runs and responds to events before anything in the this
             //state machine does
+            
             ThisEvent = RunInISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_NO_EVENT:

@@ -4,10 +4,12 @@
 #include "serial.h"
 #include "AD.h"
 #include "sensormotor.h"
-#include "BotHSM.h"
+#include "TemplateFSM.h"
+#include <stdio.h>
 
 #define SENSOR_THRESHOLD  500
 #define DEBOUNCE_COUNT    5    // number of consecutive identical readings required
+#define FRONT_TAPE_DEBOUNCE 25
 
 //#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
@@ -73,7 +75,6 @@ uint8_t BumperEventChecker(void) {
  ******************************************************************************/
 uint8_t TapeEventChecker(void) {
     static uint8_t lastFront = 0, lastRear = 0, lastLeft = 0, lastRight = 0;
-    static uint8_t cntFront = 0, cntRear = 0, cntLeft = 0, cntRight = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
@@ -84,83 +85,58 @@ uint8_t TapeEventChecker(void) {
 
     // Front
     if (curFront != lastFront) {
-        cntFront++;
-        if (cntFront >= DEBOUNCE_COUNT) {
-            lastFront = curFront;
-            cntFront = 0;
-            thisEvent.EventType = curFront ? FRONT_TAPE_ON : FRONT_TAPE_OFF;
-            thisEvent.EventParam = curFront;
-            returnVal = TRUE;
+        lastFront = curFront;
+        thisEvent.EventType = curFront ? FRONT_TAPE_ON : FRONT_TAPE_OFF;
+        thisEvent.EventParam = curFront;
+        returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-            PostBotHSM(thisEvent);
+        PostBotHSM(thisEvent);
 #else
-            SaveEvent(thisEvent);
+        SaveEvent(thisEvent);
 #endif
-        }
-    } else {
-        cntFront = 0;
     }
 
     // Rear
     if (curRear != lastRear) {
-        cntRear++;
-        if (cntRear >= DEBOUNCE_COUNT) {
-            lastRear = curRear;
-            cntRear = 0;
-            thisEvent.EventType = curRear ? REAR_TAPE_ON : REAR_TAPE_OFF;
-            thisEvent.EventParam = curRear;
-            returnVal = TRUE;
+        lastRear = curRear;
+        thisEvent.EventType = curRear ? REAR_TAPE_ON : REAR_TAPE_OFF;
+        thisEvent.EventParam = curRear;
+        returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-            PostBotHSM(thisEvent);
+        PostBotHSM(thisEvent);
 #else
-            SaveEvent(thisEvent);
+        SaveEvent(thisEvent);
 #endif
-        }
-    } else {
-        cntRear = 0;
     }
 
     // Left
     if (curLeft != lastLeft) {
-        cntLeft++;
-        if (cntLeft >= DEBOUNCE_COUNT) {
-            lastLeft = curLeft;
-            cntLeft = 0;
-            thisEvent.EventType = curLeft ? LEFT_TAPE_ON : LEFT_TAPE_OFF;
-            thisEvent.EventParam = curLeft;
-            returnVal = TRUE;
+        lastLeft = curLeft;
+        thisEvent.EventType = curLeft ? LEFT_TAPE_ON : LEFT_TAPE_OFF;
+        thisEvent.EventParam = curLeft;
+        returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-            PostBotHSM(thisEvent);
+        PostBotHSM(thisEvent);
 #else
-            SaveEvent(thisEvent);
+        SaveEvent(thisEvent);
 #endif
-        }
-    } else {
-        cntLeft = 0;
     }
 
     // Right
     if (curRight != lastRight) {
-        cntRight++;
-        if (cntRight >= DEBOUNCE_COUNT) {
-            lastRight = curRight;
-            cntRight = 0;
-            thisEvent.EventType = curRight ? RIGHT_TAPE_ON : RIGHT_TAPE_OFF;
-            thisEvent.EventParam = curRight;
-            returnVal = TRUE;
+        lastRight = curRight;
+        thisEvent.EventType = curRight ? RIGHT_TAPE_ON : RIGHT_TAPE_OFF;
+        thisEvent.EventParam = curRight;
+        returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
-            PostBotHSM(thisEvent);
+        PostBotHSM(thisEvent);
 #else
-            SaveEvent(thisEvent);
+        SaveEvent(thisEvent);
 #endif
-        }
-    } else {
-        cntRight = 0;
     }
 
     return returnVal;
 }
-
 /*******************************************************************************
  * BEACON
  ******************************************************************************/
@@ -185,6 +161,7 @@ uint8_t BeaconEventChecker(void) {
             thisEvent.EventParam = curState;
             returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST
+            printf("beacondetected\r\n");
             PostBotHSM(thisEvent);
 #else
             SaveEvent(thisEvent);
@@ -258,4 +235,4 @@ void PrintEvent(void) {
     printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X", eventName,
             EventNames[storedEvent.EventType], storedEvent.EventParam);
 }
-#endif
+#endif 

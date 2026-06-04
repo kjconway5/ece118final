@@ -127,10 +127,10 @@ static const char *EventNames[] = {
 #define TIMER2_RESP_FUNC PostBallService
 #define TIMER3_RESP_FUNC PostBotHSM
 #define TIMER4_RESP_FUNC PostBotHSM
-#define TIMER5_RESP_FUNC TIMER_UNUSED
-#define TIMER6_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC PostBotHSM
+#define TIMER6_RESP_FUNC PostBotHSM
 #define TIMER7_RESP_FUNC TIMER_UNUSED
-#define TIMER8_RESP_FUNC TIMER_UNUSED
+#define TIMER8_RESP_FUNC PostBotHSM
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
 #define TIMER11_RESP_FUNC TIMER_UNUSED
@@ -147,6 +147,10 @@ static const char *EventNames[] = {
 // the timer number matches where the timer event will be routed
 
 #define GENERIC_NAMED_TIMER 0 /*make sure this is enabled above and posting to the correct state machine*/
+#define SHOOT_TIMER 2
+#define INITTIMER 6
+#define SPINUP_TIMER 5
+#define SHAKE_TIMER 8
 
 
 /****************************************************************************/

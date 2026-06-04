@@ -31,7 +31,7 @@
  ******************************************************************************/
 
 #define SHOOT_TIMER     2
-#define SHOOT_TIME_MS   400   // ? tune this
+#define SHOOT_TIME_MS   275   // ? tune this
 #define SERVO_OPEN      1000  // 0 degrees, opens chute
 #define SERVO_CLOSED    2000  // 90 degrees, closes chute
 #define SERVO_PIN       RC_PORTX03

@@ -42,26 +42,30 @@ typedef enum {
     InitPSubState,
     Spinning,
     MoveForward,
-    LeftTape,
-    RightTape,
-    Aligned,
-    Aligned2,
+    LeftFirst,
+    LeftSecond,
+    LeftThird,
     RightFirst,
     RightSecond,
     RightThird,
+    RightFourth,
+    Aligned,
+    LeftFourth,
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
 	"InitPSubState",
 	"Spinning",
 	"MoveForward",
-	"LeftTape",
-	"RightTape",
-	"Aligned",
-	"Aligned2",
+	"LeftFirst",
+	"LeftSecond",
+	"LeftThird",
 	"RightFirst",
 	"RightSecond",
 	"RightThird",
+	"RightFourth",
+	"Aligned",
+	"LeftFourth",
 };
 
 
@@ -81,7 +85,9 @@ static const char *StateNames[] = {
 static StartingSubHSMState_t CurrentState = InitPSubState; // <- change name to match ENUM
 static uint8_t MyPriority;
 
-
+#define INITTIMER 6
+#define TIMERSEC 1000
+#define TIMERSEC2 10000
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
@@ -135,11 +141,18 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 // this is where you would put any actions associated with the
                 // transition from the initial pseudo-state into the actual
                 // initial state
-
+                ES_Timer_InitTimer(INITTIMER, TIMERSEC);
                 // now put the machine into the actual initial state
-                nextState = Spinning;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT) {
+                if (ThisEvent.EventParam == INITTIMER) {
+                    nextState = Spinning;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+            }
+            if (ThisEvent.EventType == BEACON_DETECTED) {
+                ThisEvent.EventType = ES_NO_EVENT; // swallow it
             }
             break;
 
@@ -150,12 +163,12 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == BEACON_DETECTED)// only respond to ES_Init
-            {
+            if (ThisEvent.EventType == BEACON_DETECTED) {
                 nextState = MoveForward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("Spinning to MoveForward\n");
+
             }
             break;
         case MoveForward: // in the first state, replace this with appropriate state
@@ -166,7 +179,7 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                nextState = LeftTape;
+                nextState = LeftFirst;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("MoveForward to LeftTape\n");
@@ -180,7 +193,7 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
 
             }
             break;
-        case LeftTape: // in the first state, replace this with appropriate state
+        case LeftFirst: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
                 DriveForward(500);
             }
@@ -188,15 +201,29 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                nextState = RightTape;
+                nextState = LeftSecond;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("LeftTape to RightTape\n");
             }
             break;
-        case RightTape: // in the first state, replace this with appropriate state
+        case LeftSecond: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
-                TankRight(500);
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == REAR_TAPE_ON) {
+                nextState = LeftThird;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                printf("RightTape to \n");
+            }
+            break;
+        case LeftThird: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                TurnBackRight(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
@@ -208,31 +235,21 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 printf("RightTape to \n");
             }
             break;
-        case Aligned: // in the first state, replace this with appropriate state
-            if (ThisEvent.EventType == ES_ENTRY) {
-                TurnRight(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == REAR_TAPE_ON) {
-                nextState = Aligned2;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                printf("RightTape to \n");
-            }
-            break;
-        case Aligned2: // in the first state, replace this with appropriate state
-            if (ThisEvent.EventType == ES_ENTRY) {
-                ES_Event moveEvent;
-                moveEvent.EventType = MOVE_TO_LOCATE;
-                moveEvent.EventParam = 0;
-                PostBotHSM(moveEvent);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            break;
+
+//        case LeftFourth: // in the first state, replace this with appropriate state
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                TurnBackRight(500);
+//            }
+//            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+//                nextState = Aligned;
+//                makeTransition = TRUE;
+//                ThisEvent.EventType = ES_NO_EVENT;
+//                printf("RightTape to \n");
+//            }
+//            if (ThisEvent.EventType == ES_EXIT) {
+//                StopDriving();
+//            }
+//            break;
 
         case RightFirst: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
@@ -242,7 +259,7 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                nextState = RightTape;
+                nextState = RightSecond;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("LeftTape to RightTape\n");
@@ -250,13 +267,13 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             break;
         case RightSecond: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
-                TankLeft(500);
+                TurnLeft(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                nextState = RightTape;
+            if (ThisEvent.EventType == REAR_TAPE_ON) {
+                nextState = RightThird;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("LeftTape to RightTape\n");
@@ -264,16 +281,42 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             break;
         case RightThird: // in the first state, replace this with appropriate state
             if (ThisEvent.EventType == ES_ENTRY) {
-                TurnLeft(500);
+                TurnBackLeft(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == REAR_TAPE_ON) {
-                nextState = Aligned2;
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = Aligned;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 printf("LeftTape to RightTape\n");
+            }
+            break;
+
+//        case RightFourth: // in the first state, replace this with appropriate state
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                TurnBackLeft(500);
+//            }
+//            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+//                nextState = Aligned;
+//                makeTransition = TRUE;
+//                ThisEvent.EventType = ES_NO_EVENT;
+//                printf("RightTape to \n");
+//            }
+//            if (ThisEvent.EventType == ES_EXIT) {
+//                StopDriving();
+//            }
+//            break;
+        case Aligned: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Event moveEvent;
+                moveEvent.EventType = MOVE_TO_LOCATE;
+                moveEvent.EventParam = 0;
+                PostBotHSM(moveEvent);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
             }
             break;
         default: // all unhandled states fall into here

@@ -33,7 +33,6 @@
 #include "BotHSM.h"
 #include "LocateISZSubHSM.h"
 #include "sensormotor.h"
-#include <stdio.h>
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -46,6 +45,8 @@ typedef enum {
     FORWARD_OFF,
     BUMPED,
     CROSSING,
+    LCORNER2,
+    RCORNER2,
 
 } StartingSubHSMState_t;
 
@@ -57,12 +58,14 @@ static const char *StateNames[] = {
 	"FORWARD_OFF",
 	"BUMPED",
 	"CROSSING",
+	"LCORNER2",
+	"RCORNER2",
 };
 
 
 
 #define TURN_TIMER 4
-#define TURN_TIME 5000
+#define TURN_TIME 2000
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -75,16 +78,12 @@ static const char *StateNames[] = {
  ******************************************************************************/
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
-
+int turn_counter = 0; 
 static StartingSubHSMState_t CurrentState = InitPSubState;
 static StartingSubHSMState_t PreviousState = InitPSubState;
 static uint8_t MyPriority;
 
 // tape state tracking for combo detection
-static uint8_t frontTapeOn = 0;
-static uint8_t rightTapeOn = 0;
-static uint8_t leftTapeOn = 0;
-
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -143,180 +142,144 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
 
         case FORWARD:
             if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In FORWARD state\n");
                 DriveForward(500);
-                frontTapeOn = 0; // reset tape flags on entry
-                rightTapeOn = 0;
-                leftTapeOn = 0;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-
-            // track individual tape sensor states
-            if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                frontTapeOn = 1;
-            }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
-                frontTapeOn = 0;
-            }
             if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                rightTapeOn = 1;
-            }
-            if (ThisEvent.EventType == RIGHT_TAPE_OFF) {
-                rightTapeOn = 0;
-            }
-            if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                leftTapeOn = 1;
-            }
-            if (ThisEvent.EventType == LEFT_TAPE_OFF) {
-                leftTapeOn = 0;
-            }
-
-            // right corner: front + right sensors both on
-            if (frontTapeOn && rightTapeOn) {
                 nextState = RCORNER;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                // left corner: front + left sensors both on
-            } else if (frontTapeOn && leftTapeOn) {
+            } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
                 nextState = LCORNER;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
-
-            if (ThisEvent.EventType == LEFT_BUMPER_PRESSED || ThisEvent.EventType == RIGHT_BUMPER_PRESSED) {
-                nextState = BUMPED;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-
-            // if (ThisEvent.EventType == FRONT_TAPE_OFF) {
-            //     nextState = FORWARD_OFF;
-            //     makeTransition = TRUE;
-            //     ThisEvent.EventType = ES_NO_EVENT;
-            // }
-
             break;
 
         case FORWARD_OFF:
             if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In FORWARD_OFF state\n");
                 DriveForward(500);
             }
-
-            if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                frontTapeOn = 1;
-            }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
-                frontTapeOn = 0;
-            }
             if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                rightTapeOn = 1;
-            }
-            if (ThisEvent.EventType == RIGHT_TAPE_OFF) {
-                rightTapeOn = 0;
-            }
-            if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                leftTapeOn = 1;
-            }
-            if (ThisEvent.EventType == LEFT_TAPE_OFF) {
-                leftTapeOn = 0;
-            }
-
-            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                TurnRight(500);
+                TurnBackRight(500);
             } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                TurnBackLeft(500);
+            } else if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = FORWARD;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                nextState = FORWARD;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+            // right corner: front + right sensors both on
+
+
+        case LCORNER:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
+                nextState = LCORNER2;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                StopDriving();
+            }
+            break;
+        case LCORNER2:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                turn_counter++;
+                if (turn_counter >= 2) {
+                    StopDriving();
+                }
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                
+                nextState = FORWARD;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+
+
+        case RCORNER:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
                 TurnLeft(500);
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-
-
+            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
+                nextState = RCORNER2;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+        case RCORNER2:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                turn_counter++;
+                if (turn_counter >= 2) {
+                    StopDriving();
+                }
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+                TurnLeft(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
             if (ThisEvent.EventType == FRONT_TAPE_ON) {
                 nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
-            // right corner: front + right sensors both on
-            if (frontTapeOn && rightTapeOn) {
-                nextState = RCORNER;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                // left corner: front + left sensors both on
-            } else if (frontTapeOn && leftTapeOn) {
-                nextState = LCORNER;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-
-            if (ThisEvent.EventType == LEFT_BUMPER_PRESSED || ThisEvent.EventType == RIGHT_BUMPER_PRESSED) {
-                nextState = BUMPED;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
             break;
 
-        case LCORNER:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In LCORNER state\n");
-                TankLeft(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            // if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
-            //     nextState = LCORNER2;
-            //     makeTransition = TRUE;
-            //     ThisEvent.EventType = ES_NO_EVENT;
-            // }
-            break;
 
-        case RCORNER:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In RCORNER state\n");
-                TankLeft(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            // if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == TURN_TIMER) {
-            //     nextState = RCORNER2;
-            //     makeTransition = TRUE;
-            //     ThisEvent.EventType = ES_NO_EVENT;
-            // }
-            break;
-
-        case BUMPED:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In BUMPED state\n");
-                TankLeft(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == ES_TIMEOUT) {
-                nextState = CROSSING;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-
-        case CROSSING:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                printf("In CROSSING state\n");
-                TankLeft(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
-                nextState = FORWARD;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
+            //        case BUMPED:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                TankLeft(500);
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                StopDriving();
+            //            }
+            //            if (ThisEvent.EventType == ES_TIMEOUT) {
+            //                nextState = CROSSING;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            break;
+            //
+            //        case CROSSING:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                TankLeft(500);
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                StopDriving();
+            //            }
+            //            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
+            //                nextState = FORWARD;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            break;
 
         default:
             break;
