@@ -56,6 +56,10 @@ typedef enum {
     LEFT_TAPE_OFF,
     RIGHT_TAPE_ON,
     RIGHT_TAPE_OFF,
+    FRONT_RIGHT_TAPE_ON,
+    FRONT_RIGHT_TAPE_OFF,
+    FRONT_LEFT_TAPE_ON,
+    FRONT_LEFT_TAPE_OFF,
     BEACON_DETECTED,
     BEACON_LOST,
     TRACKWIRE_DETECTED,
@@ -94,6 +98,10 @@ static const char *EventNames[] = {
 	"LEFT_TAPE_OFF",
 	"RIGHT_TAPE_ON",
 	"RIGHT_TAPE_OFF",
+	"FRONT_RIGHT_TAPE_ON",
+	"FRONT_RIGHT_TAPE_OFF",
+	"FRONT_LEFT_TAPE_ON",
+	"FRONT_LEFT_TAPE_OFF",
 	"BEACON_DETECTED",
 	"BEACON_LOST",
 	"TRACKWIRE_DETECTED",
@@ -131,7 +139,7 @@ static const char *EventNames[] = {
 #define TIMER6_RESP_FUNC PostBotHSM
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC PostBotHSM
-#define TIMER9_RESP_FUNC TIMER_UNUSED
+#define TIMER9_RESP_FUNC PostBotHSM
 #define TIMER10_RESP_FUNC TIMER_UNUSED
 #define TIMER11_RESP_FUNC TIMER_UNUSED
 #define TIMER12_RESP_FUNC TIMER_UNUSED
@@ -151,6 +159,7 @@ static const char *EventNames[] = {
 #define INITTIMER 6
 #define SPINUP_TIMER 5
 #define SHAKE_TIMER 8
+#define CORRECTING_TIMER 9
 
 
 /****************************************************************************/

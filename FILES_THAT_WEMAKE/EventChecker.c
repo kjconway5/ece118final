@@ -74,7 +74,7 @@ uint8_t BumperEventChecker(void) {
  * TAPE SENSORS
  ******************************************************************************/
 uint8_t TapeEventChecker(void) {
-    static uint8_t lastFront = 0, lastRear = 0, lastLeft = 0, lastRight = 0;
+    static uint8_t lastFront = 0, lastRear = 0, lastLeft = 0, lastRight = 0, lastFrontLeft = 0, lastFrontRight = 0;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
 
@@ -134,7 +134,33 @@ uint8_t TapeEventChecker(void) {
         SaveEvent(thisEvent);
 #endif
     }
+    // After all debounce logic
+    uint8_t curFrontRight = lastFront && lastRight;
+    uint8_t curFrontLeft = lastFront && lastLeft;
 
+    if (curFrontRight != lastFrontRight) {
+        lastFrontRight = curFrontRight;
+        thisEvent.EventType = curFrontRight ? FRONT_RIGHT_TAPE_ON : FRONT_RIGHT_TAPE_OFF;
+        thisEvent.EventParam = curFrontRight;
+        returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+        PostBotHSM(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
+
+    if (curFrontLeft != lastFrontLeft) {
+        lastFrontLeft = curFrontLeft;
+        thisEvent.EventType = curFrontLeft ? FRONT_LEFT_TAPE_ON : FRONT_LEFT_TAPE_OFF;
+        thisEvent.EventParam = curFrontLeft;
+        returnVal = TRUE;
+#ifndef EVENTCHECKER_TEST
+        PostBotHSM(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
     return returnVal;
 }
 /*******************************************************************************

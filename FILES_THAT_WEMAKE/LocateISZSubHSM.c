@@ -42,7 +42,9 @@ typedef enum {
     LCORNER,
     RCORNER,
     FORWARD,
-    FORWARD_OFF,
+    CORRECTING,
+    CORRECTING2,
+
     BUMPED,
     CROSSING,
     LCORNER2,
@@ -55,7 +57,8 @@ static const char *StateNames[] = {
 	"LCORNER",
 	"RCORNER",
 	"FORWARD",
-	"FORWARD_OFF",
+	"CORRECTING",
+	"CORRECTING2",
 	"BUMPED",
 	"CROSSING",
 	"LCORNER2",
@@ -66,6 +69,8 @@ static const char *StateNames[] = {
 
 #define TURN_TIMER 4
 #define TURN_TIME 2000
+#define CORRECTING_TIMER 9
+#define CORRECTING_TIME 2000
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
@@ -78,7 +83,7 @@ static const char *StateNames[] = {
  ******************************************************************************/
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
-int turn_counter = 0; 
+int turn_counter = 0;
 static StartingSubHSMState_t CurrentState = InitPSubState;
 static StartingSubHSMState_t PreviousState = InitPSubState;
 static uint8_t MyPriority;
@@ -151,22 +156,43 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 nextState = RCORNER;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
+            }
+            if (ThisEvent.EventType == LEFT_TAPE_ON) {
                 nextState = LCORNER;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_OFF) {
+                nextState = CORRECTING;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case FORWARD_OFF:
+        case CORRECTING:
             if (ThisEvent.EventType == ES_ENTRY) {
-                DriveForward(500);
+                ES_Timer_InitTimer(CORRECTING_TIMER, CORRECTING_TIME);
+                TankLeft(500);
             }
-            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                TurnBackRight(500);
-            } else if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                TurnBackLeft(500);
-            } else if (ThisEvent.EventType == FRONT_TAPE_ON) {
+            if (ThisEvent.EventType == LEFT_TAPE_ON) {
+                StopDriving();
+                nextState = CORRECTING2;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == CORRECTING_TIMER) {
+                TankRight(500);
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                StopDriving();
+            }
+            break;
+        case CORRECTING2:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                TurnRight(500);
+            }
+            if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                StopDriving();
                 nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -174,13 +200,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 StopDriving();
             }
-            if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                nextState = FORWARD;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
             break;
-            // right corner: front + right sensors both on
 
 
         case LCORNER:
@@ -202,7 +222,10 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 turn_counter++;
                 if (turn_counter >= 2) {
-                    StopDriving();
+                    ES_Event moveEvent;
+                    moveEvent.EventType = MOVE_TO_SHOOTING;
+                    moveEvent.EventParam = 0;
+                    PostBotHSM(moveEvent);
                 }
                 ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
                 TurnRight(500);
@@ -211,7 +234,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == FRONT_TAPE_ON) {
-                
+
                 nextState = FORWARD;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -237,7 +260,10 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 turn_counter++;
                 if (turn_counter >= 2) {
-                    StopDriving();
+                    ES_Event moveEvent;
+                    moveEvent.EventType = MOVE_TO_SHOOTING;
+                    moveEvent.EventParam = 0;
+                    PostBotHSM(moveEvent);
                 }
                 ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
                 TurnLeft(500);
@@ -251,6 +277,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
+
 
 
             //        case BUMPED:
