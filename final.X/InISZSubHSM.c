@@ -60,6 +60,8 @@ static const char *StateNames[] = {
 #define SPINUP_TIME_MS1  5000
 #define SHAKE_TIMER 8
 #define SHAKE_TIME  50
+#define SHOOTING_SPIN_TIMER 14
+#define SHOOTING_SPIN_TIME 50
 //#define SPINUP_TIME_MS3  5000
 //#define SPINUP_TIME_MS4  5000
 int count = 0;
@@ -166,6 +168,12 @@ ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
                 StopDriving();
             }
             if (ThisEvent.EventType == BEACON_DETECTED) {
+                // nextState = Charge1;
+                // makeTransition = TRUE;
+                // ThisEvent.EventType = ES_NO_EVENT;
+                ES_Timer_InitTimer(SHOOTING_SPIN_TIMER, SHOOTING_SPIN_TIME);
+            }   
+            if ((ThisEvent.EventType == ES_TIMEOUT) && (ThisEvent.EventParam == SHOOTING_SPIN_TIMER)) {
                 nextState = Charge1;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;

@@ -145,7 +145,7 @@ static const char *EventNames[] = {
 #define TIMER11_RESP_FUNC PostBotHSM
 #define TIMER12_RESP_FUNC PostBotHSM
 #define TIMER13_RESP_FUNC PostBotHSM
-#define TIMER14_RESP_FUNC TIMER_UNUSED
+#define TIMER14_RESP_FUNC PostBotHSM
 #define TIMER15_RESP_FUNC TIMER_UNUSED
 
 
@@ -163,6 +163,8 @@ static const char *EventNames[] = {
 #define TANK_OBSTACLE 11
 #define BACKUP_TIMER1 12
 #define TANK_TIMER2 13
+#define SHOOTING_SPIN_TIMER 14
+
 
 
 /****************************************************************************/
