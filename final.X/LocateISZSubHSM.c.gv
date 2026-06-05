@@ -1,0 +1,171 @@
+
+digraph fsm {
+
+    // header
+    // rankdir=LR;
+InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabels=false];
+
+    // states
+    node [shape=plaintext]
+
+    FORWARD [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">FORWARD</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TurnRight(650);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    CORRECTLEFT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CORRECTLEFT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TurnLeft(650);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    LCORNER [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">LCORNER</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    turn_counter++;</TD></TR>
+        <TR><TD ALIGN="LEFT">                    CheckMoveToShooting();</TD></TR>
+        <TR><TD ALIGN="LEFT">                    TankRight(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(4, 1000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    FORWARD_LEFT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">FORWARD_LEFT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TurnLeft(650);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    CORRECTRIGHT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CORRECTRIGHT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TurnRight(650);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    RCORNER [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">RCORNER</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    turn_counter++;</TD></TR>
+        <TR><TD ALIGN="LEFT">                    CheckMoveToShooting();</TD></TR>
+        <TR><TD ALIGN="LEFT">                    TankLeft(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(4, 1000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    // guards
+
+    // transitions
+InitPSubState -> FORWARD[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+        </TABLE>>];
+
+FORWARD -> CORRECTLEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_OFF</TD></TR>
+        </TABLE>>];
+
+FORWARD -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+FORWARD -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTLEFT -> FORWARD[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTLEFT -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTLEFT -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+LCORNER -> CORRECTLEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(4)</TD></TR>
+        </TABLE>>];
+
+FORWARD_LEFT -> CORRECTRIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_OFF</TD></TR>
+        </TABLE>>];
+
+FORWARD_LEFT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+FORWARD_LEFT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTRIGHT -> FORWARD_LEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTRIGHT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CORRECTRIGHT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+RCORNER -> CORRECTRIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(4)</TD></TR>
+        </TABLE>>];
+
+
+}

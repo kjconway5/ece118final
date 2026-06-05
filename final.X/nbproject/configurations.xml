@@ -78,11 +78,11 @@
       <itemPath>BallService.c</itemPath>
       <itemPath>BotHSM.c</itemPath>
       <itemPath>EventChecker.c</itemPath>
-      <itemPath>InISZSubHSM.c</itemPath>
       <itemPath>LocateISZSubHSM.c</itemPath>
       <itemPath>sensormotor.c</itemPath>
       <itemPath>StartingSubHSM.c</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
+      <itemPath>InISZSubHSM.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

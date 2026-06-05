@@ -144,11 +144,11 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
                 // transition from the initial pseudo-state into the actual
                 // initial state
                 // Initialize all sub-state machines
-                InitStartingSubHSM();
+                // InitStartingSubHSM();
                 //InitInISZSubHSM();
-                //InitLocateISZSubHSM();
+                InitLocateISZSubHSM();
                 // now put the machine into the actual initial state
-                nextState = Starting;
+                nextState = LocateISZ;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -179,10 +179,10 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
             //state machine does
             ThisEvent = RunLocateISZSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {
-                // case MOVE_TO_SHOOTING:
-                //     nextState = InISZ;
-                //     makeTransition = TRUE;
-                //     ThisEvent.EventType = ES_NO_EVENT;
+                case MOVE_TO_SHOOTING:
+                    nextState = InISZ;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                 //     break;
                 case ES_EXIT:
                     break;

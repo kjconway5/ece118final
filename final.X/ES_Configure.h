@@ -59,8 +59,10 @@ typedef enum {
     LEFT_TAPE_OFF,
     RIGHT_TAPE_ON,
     RIGHT_TAPE_OFF,
-    FRONT_RIGHT_TAPE,
-    FRONT_LEFT_TAPE,
+    FRONT_RIGHT_TAPE_ON,
+    FRONT_LEFT_TAPE_ON,
+    FRONT_RIGHT_TAPE_OFF,
+    FRONT_LEFT_TAPE_OFF,
 
     BEACON_DETECTED,
     BEACON_LOST,
@@ -88,10 +90,12 @@ static const char *EventNames[] = {
 	"ES_TIMEOUT",
 	"ES_TIMERACTIVE",
 	"ES_TIMERSTOPPED",
+
 	"LEFT_BUMPER_PRESSED",
 	"LEFT_BUMPER_RELEASED",
 	"RIGHT_BUMPER_PRESSED",
 	"RIGHT_BUMPER_RELEASED",
+
 	"FRONT_TAPE_ON",
 	"FRONT_TAPE_OFF",
 	"REAR_TAPE_ON",
@@ -100,8 +104,11 @@ static const char *EventNames[] = {
 	"LEFT_TAPE_OFF",
     "RIGHT_TAPE_ON",
     "RIGHT_TAPE_OFF",
-    "FRONT_RIGHT_TAPE",
-    "FRONT_LEFT_TAPE",
+    "FRONT_RIGHT_TAPE_ON",
+    "FRONT_LEFT_TAPE_ON",
+    "FRONT_RIGHT_TAPE_OFF",
+    "FRONT_LEFT_TAPE_OFF",
+
 	"BEACON_DETECTED",
 	"BEACON_LOST",
 	"TRACKWIRE_DETECTED",
@@ -111,12 +118,6 @@ static const char *EventNames[] = {
 	"SHOOT",
 	"NUMBEROFEVENTS",
 };
-
-
-
-
-
-
 
 /****************************************************************************/
 // This are the name of the Event checking function header file.
@@ -138,10 +139,10 @@ static const char *EventNames[] = {
 #define TIMER5_RESP_FUNC PostBotHSM
 #define TIMER6_RESP_FUNC PostBotHSM
 #define TIMER7_RESP_FUNC PostBotHSM
-#define TIMER8_RESP_FUNC TIMER_UNUSED
-#define TIMER9_RESP_FUNC TIMER_UNUSED
-#define TIMER10_RESP_FUNC TIMER_UNUSED
-#define TIMER11_RESP_FUNC TIMER_UNUSED
+#define TIMER8_RESP_FUNC PostBotHSM
+#define TIMER9_RESP_FUNC PostBotHSM
+#define TIMER10_RESP_FUNC PostBotHSM
+#define TIMER11_RESP_FUNC PostBotHSM
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
@@ -155,6 +156,10 @@ static const char *EventNames[] = {
 // the timer number matches where the timer event will be routed
 
 #define GENERIC_NAMED_TIMER 0 /*make sure this is enabled above and posting to the correct state machine*/
+#define TURN_TIMER 4
+#define CROSSING_TIMER 7
+#define BACKUP_TIMER 10
+#define TANK_OBSTACLE 11
 
 
 /****************************************************************************/

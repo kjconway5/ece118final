@@ -71,5 +71,7 @@ uint8_t InitLocateISZSubHSM(void);
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunLocateISZSubHSM(ES_Event ThisEvent);
 
+static void CheckMoveToShooting(void);
+
 #endif /* SUB_HSM_Template_H */
 

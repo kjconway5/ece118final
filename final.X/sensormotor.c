@@ -206,14 +206,14 @@ void TurnRight(int speed) {
 }
 
 void TurnLeft(int speed) {
-    IO_PortsSetPortBits(PORTZ, LeftDriveIN1);
+    IO_PortsClearPortBits(PORTZ, LeftDriveIN1);
     IO_PortsClearPortBits(PORTZ, LeftDriveIN2);
 
     IO_PortsClearPortBits(PORTZ, RightDriveIN2);
-    IO_PortsClearPortBits(PORTZ, RightDriveIN1);
+    IO_PortsSetPortBits(PORTZ, RightDriveIN1);
 
-    PWM_SetDutyCycle(LeftDriveMotorPWM, speed);
-    PWM_SetDutyCycle(RightDriveMotorPWM, 0);
+    PWM_SetDutyCycle(LeftDriveMotorPWM, 0);
+    PWM_SetDutyCycle(RightDriveMotorPWM, speed);
 }
 
 

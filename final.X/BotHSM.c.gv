@@ -1,0 +1,80 @@
+
+digraph fsm {
+
+    // header
+    // rankdir=LR;
+InitPState[shape = "point", color = "black",style="filled",width=.1,forcelabels=false];
+
+    // states
+    node [shape=plaintext]
+
+    Starting [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">Starting</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT">▶️ RunStartingSubHSM</TD>
+        </TR>
+
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    LocateISZ [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">LocateISZ</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT">▶️ RunLocateISZSubHSM</TD>
+        </TR>
+
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    InISZ [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">InISZ</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT">▶️ RunInISZSubHSM</TD>
+        </TR>
+
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    // guards
+
+    // transitions
+InitPState -> LocateISZ[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                InitLocateISZSubHSM();</TD></TR>
+        </TABLE>>];
+
+Starting -> LocateISZ[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">MOVE_TO_LOCATE</TD></TR>
+            <TR><TD ALIGN="LEFT">                   InitLocateISZSubHSM();</TD></TR>
+        </TABLE>>];
+
+LocateISZ -> InISZ[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">MOVE_TO_SHOOTING</TD></TR>
+        </TABLE>>];
+
+
+}
