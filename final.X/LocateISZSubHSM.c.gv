@@ -96,7 +96,7 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
         </TR>
-        <TR><TD ALIGN="LEFT">                    TurnBackLeft(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    TankLeft(650);</TD></TR>
         <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(11, 600);</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
@@ -205,7 +205,7 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
     // guards
 
     // transitions
-InitPSubState -> FORWARD[label=<<TABLE BORDER="0" CELLBORDER="0">
+InitPSubState -> CORRECTLEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
         </TABLE>>];
 

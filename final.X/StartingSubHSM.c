@@ -76,7 +76,9 @@ static uint8_t MyPriority;
 #define TIMERSEC 1000
 #define TIMERSEC2 10000
 #define BACKUP_TIMER1 12
+#define TANK_TIMER2 13
 #define BACKUP_TIME 1000
+#define TANK_TIME2 3000
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
@@ -146,63 +148,84 @@ ES_Event RunStartingSubHSM(ES_Event ThisEvent) {
             break;
 
         case Spinning: // in the first state, replace this with appropriate state
-            if (ThisEvent.EventType == ES_ENTRY) {
-                TankRight(500);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == BEACON_DETECTED) {
-                nextState = MoveBackward;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                printf("Spinning to MoveForward\n");
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    TankRight(500);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
 
+                case BEACON_DETECTED: 
+                    nextState = MoveBackward;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
             }
             break;
-        case MoveBackward:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                ES_Timer_InitTimer(BACKUP_TIMER1, BACKUP_TIME);
-                DriveBackward(500);
+        
+        case MoveBackward: // in the first state, replace this with appropriate state
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    DriveBackward(500);
+                    ES_Timer_InitTimer(BACKUP_TIMER1, BACKUP_TIME);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case ES_TIMEOUT: 
+                    if (ThisEvent.EventParam == BACKUP_TIMER1) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    }
+                    break;
             }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == BACKUP_TIMER1) {
-                nextState = MoveForward;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
+            break; 
 
         case MoveForward: // in the first state, replace this with appropriate state
-            if (ThisEvent.EventType == ES_ENTRY) {
-                DriveForward(500);
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    DriveForward(500);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case FRONT_TAPE_ON:
+                case RIGHT_TAPE_ON:
+                case LEFT_TAPE_ON:
+                    // StopDriving();
+                    nextState = Aligned;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
             }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            if (ThisEvent.EventType == LEFT_TAPE_ON) {
-                nextState = Aligned;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-        case Aligned:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                TankLeft(500);
-            }
-            if (ThisEvent.EventType == RIGHT_TAPE_ON) {
-                // StopDriving(); 
-               ES_Event moveEvent;
-               moveEvent.EventType = MOVE_TO_LOCATE;
-               moveEvent.EventParam = 0;
-               PostBotHSM(moveEvent);
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                StopDriving();
-            }
-            break;
+            break; 
             
+        case Aligned: // in the first state, replace this with appropriate state
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    TankLeft(500);
+                    ES_Timer_InitTimer(TANK_TIMER2, TANK_TIME2);
+                    break;
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case ES_TIMEOUT: 
+                    if (ThisEvent.EventParam == TANK_TIMER2) {
+                        // StopDriving();
+                        ES_Event moveEvent;
+                        moveEvent.EventType = MOVE_TO_LOCATE;
+                        moveEvent.EventParam = 0;
+                        PostBotHSM(moveEvent);
+                    }
+                    break;
+            }
+            break; 
         default: // all unhandled states fall into here
             break;
     } // end switch on Current State

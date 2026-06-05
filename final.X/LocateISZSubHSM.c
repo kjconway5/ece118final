@@ -164,7 +164,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
         case InitPSubState:
             turn_counter = 0;
             if (ThisEvent.EventType == ES_INIT) {
-                nextState = FORWARD;
+                nextState = CORRECTLEFT;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }

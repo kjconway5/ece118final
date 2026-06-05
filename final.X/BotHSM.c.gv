@@ -62,9 +62,9 @@ InitPState[shape = "point", color = "black",style="filled",width=.1,forcelabels=
     // guards
 
     // transitions
-InitPState -> LocateISZ[label=<<TABLE BORDER="0" CELLBORDER="0">
+InitPState -> Starting[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
-            <TR><TD ALIGN="LEFT">                InitLocateISZSubHSM();</TD></TR>
+            <TR><TD ALIGN="LEFT">                InitStartingSubHSM();</TD></TR>
         </TABLE>>];
 
 Starting -> LocateISZ[label=<<TABLE BORDER="0" CELLBORDER="0">

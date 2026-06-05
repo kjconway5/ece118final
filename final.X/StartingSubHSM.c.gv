@@ -28,7 +28,7 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
         </TR>
-        <TR><TD ALIGN="LEFT">                ES_Timer_InitTimer(12, 1000);</TD></TR>
+        <TR><TD ALIGN="LEFT">                DriveBackward(650);</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
         </TR>
@@ -77,7 +77,7 @@ Spinning -> MoveBackward[label=<<TABLE BORDER="0" CELLBORDER="0">
 
 MoveBackward -> 244[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(12)</TD></TR>
-            <TR><TD ALIGN="LEFT">                DriveBackward(500);</TD></TR>
+            <TR><TD ALIGN="LEFT">                DriveBackward(650);</TD></TR>
             <TR><TD ALIGN="LEFT">            }</TD></TR>
             <TR><TD ALIGN="LEFT">                StopDriving();</TD></TR>
             <TR><TD ALIGN="LEFT">            }</TD></TR>
