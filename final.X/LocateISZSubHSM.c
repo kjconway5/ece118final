@@ -359,7 +359,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
         case CROSSING_LEFT2:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    TurnBackLeft(650);
+                    TankLeft(650);
                     ES_Timer_InitTimer(TANK_OBSTACLE, 600);
                     break;
 
