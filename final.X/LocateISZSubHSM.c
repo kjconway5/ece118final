@@ -46,21 +46,28 @@ typedef enum {
     FORWARD_LEFT,
     CORRECTRIGHT,
     BUMPED_LEFT,
-    CROSSING_LEFT
-
+    CROSSING_LEFT,
+    CROSSING_LEFT2,
+    BUMPED_RIGHT,
+    CROSSING_RIGHT,
+    CROSSING_RIGHT2,
 
 } StartingSubHSMState_t;
 
 static const char *StateNames[] = {
-	"InitPSubState",
-	"LCORNER",
-	"RCORNER",
-	"FORWARD",
-	"CORRECTLEFT",
-	"FORWARD_LEFT",
-	"CORRECTRIGHT",
+    "InitPSubState",
+    "LCORNER",
+    "RCORNER",
+    "FORWARD",
+    "CORRECTLEFT",
+    "FORWARD_LEFT",
+    "CORRECTRIGHT",
     "BUMPED_LEFT",
-    "CROSSING_LEFT"
+    "CROSSING_LEFT",
+    "CROSSING_LEFT2",
+    "BUMPED_RIGHT",
+    "CROSSING_RIGHT",
+    "CROSSING_RIGHT2",
 };
 
 
@@ -101,8 +108,7 @@ static uint8_t MyPriority;
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
-static void CheckMoveToShooting(void)
-{
+static void CheckMoveToShooting(void) {
     if (turn_counter >= 2) {
         // StopDriving();
         ES_Event moveEvent;
@@ -111,6 +117,7 @@ static void CheckMoveToShooting(void)
         PostBotHSM(moveEvent);
     }
 }
+
 /**
  * @Function InitLocateISZSubHSM(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
@@ -162,10 +169,10 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-        
-        case FORWARD: 
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
+
+        case FORWARD:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
                     TurnRight(650);
                     break;
                 case RIGHT_TAPE_OFF:
@@ -173,7 +180,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
-                
+
                 case LEFT_TAPE_ON:
                     nextState = LCORNER;
                     makeTransition = TRUE;
@@ -185,7 +192,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
-                
+
                 case LEFT_BUMPER_PRESSED:
                 case RIGHT_BUMPER_PRESSED:
                     nextState = BUMPED_LEFT;
@@ -197,14 +204,14 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     StopDriving();
                     break;
 
-                case ES_NO_EVENT: 
+                case ES_NO_EVENT:
                     break;
             }
             break;
 
         case CORRECTLEFT:
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
                     TurnLeft(650);
                     break;
                 case RIGHT_TAPE_ON:
@@ -218,7 +225,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
-                
+
                 case FRONT_TAPE_ON:
                     nextState = LCORNER;
                     makeTransition = TRUE;
@@ -236,14 +243,14 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     StopDriving();
                     break;
 
-                case ES_NO_EVENT: 
+                case ES_NO_EVENT:
                     break;
             }
             break;
 
         case LCORNER:
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
                     turn_counter++;
                     CheckMoveToShooting();
                     TankRight(650);
@@ -256,13 +263,13 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                     }
                     break;
-                    
+
                 case ES_EXIT:
                     StopDriving();
-                    
+
                     break;
 
-                case ES_NO_EVENT: 
+                case ES_NO_EVENT:
                     break;
             }
             break;
@@ -280,10 +287,10 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
 
                 case ES_TIMEOUT:
                     if (ThisEvent.EventParam == BACKUP_TIMER) {
-                            TankRight(650);
-                            ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
-                        }
-                    
+                        TankRight(650);
+                        ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                    }
+
 
                     if (ThisEvent.EventParam == TANK_OBSTACLE) {
                         // StopDriving();
@@ -312,13 +319,15 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                         // TankRight(500);
                         // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
                     }
-                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
-                        // StopDriving();
-                        nextState = CORRECTRIGHT;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
+
+                    // if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                    //     // StopDriving();
+
+                    //     nextState = CORRECTRIGHT;
+                    //     makeTransition = TRUE;
+                    //     ThisEvent.EventType = ES_NO_EVENT;
+                    // }
+                    // break;
 
                 case FRONT_TAPE_ON:
                 case FRONT_TAPE_OFF:
@@ -337,127 +346,281 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                             // nextState = FORWARD;
                             // makeTransition = TRUE;
                             // ThisEvent.EventType = ES_NO_EVENT;
-                            TankLeft(500);
-                            ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                            nextState = CROSSING_LEFT2;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
                         }
                     }
                     break;
+            }
+            break;
 
-
-            case ES_NO_EVENT:
-            default:
-                break;
-        }
-        break;
-
-// FORWARD_LEFT
-        case FORWARD_LEFT: 
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
-                    TurnLeft(650);
-                    break;
-                case LEFT_TAPE_OFF:
-                    nextState = CORRECTRIGHT;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                
-                case RIGHT_TAPE_ON:
-                    nextState = RCORNER;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case FRONT_TAPE_ON:
-                    nextState = RCORNER;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+        case CROSSING_LEFT2:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    TurnBackLeft(650);
+                    ES_Timer_InitTimer(TANK_OBSTACLE, 600);
                     break;
 
                 case ES_EXIT:
                     StopDriving();
                     break;
 
-                case ES_NO_EVENT: 
-                    break;
-            }
-            break;
-
-        case CORRECTRIGHT:
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
-                    TurnRight(650);
-                    break;
-                case LEFT_TAPE_ON:
-                    nextState = FORWARD_LEFT;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_ON:
-                    nextState = RCORNER;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                
-                case FRONT_TAPE_ON:
-                    nextState = RCORNER;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_EXIT:
-                    StopDriving();
-                    break;
-
-                case ES_NO_EVENT: 
-                    break;
-            }
-            break;
-
-        case RCORNER:
-            switch(ThisEvent.EventType) {
-                case ES_ENTRY: 
-                    turn_counter++;
-                    CheckMoveToShooting();
-                    TankLeft(650);
-                    ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
-                    
-                    break;
                 case ES_TIMEOUT:
-                    if (ThisEvent.EventParam == TURN_TIMER) {
+                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                        // StopDriving();
                         nextState = CORRECTRIGHT;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                     }
                     break;
-                    
-                case ES_EXIT:
-                    StopDriving();
-                    
+
+                    // case LEFT_TAPE_ON:
+                    //     nextState = CORRECTRIGHT;
+                    //     makeTransition = TRUE;
+                    //     ThisEvent.EventType = ES_NO_EVENT;
+                    //     break;
+
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+            break;
+
+    // FORWARD_LEFT
+    case FORWARD_LEFT:
+    switch (ThisEvent.EventType) {
+        case ES_ENTRY:
+            TurnLeft(650);
+            break;
+        case FRONT_TAPE_OFF:
+            nextState = CORRECTRIGHT;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        case RIGHT_TAPE_ON:
+            nextState = RCORNER;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        case LEFT_BUMPER_PRESSED:
+        case RIGHT_BUMPER_PRESSED:
+            nextState = BUMPED_RIGHT;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        // case FRONT_TAPE_ON:
+        //     nextState = RCORNER;
+        //     makeTransition = TRUE;
+        //     ThisEvent.EventType = ES_NO_EVENT;
+        //     break;
+
+        case ES_EXIT:
+            StopDriving();
+            break;
+
+        case ES_NO_EVENT:
+            break;
+    }
+    break;
+
+    case CORRECTRIGHT:
+    switch (ThisEvent.EventType) {
+        case ES_ENTRY:
+            TurnRight(650);
+            break;
+        case FRONT_TAPE_ON:
+            nextState = FORWARD_LEFT;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        case RIGHT_TAPE_ON:
+            nextState = RCORNER;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        case LEFT_BUMPER_PRESSED:
+        case RIGHT_BUMPER_PRESSED:
+            nextState = BUMPED_RIGHT;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+            break;
+
+        // case FRONT_TAPE_ON:
+        //     nextState = RCORNER;
+        //     makeTransition = TRUE;
+        //     ThisEvent.EventType = ES_NO_EVENT;
+        //     break;
+
+        case ES_EXIT:
+            StopDriving();
+            break;
+
+        case ES_NO_EVENT:
+            break;
+    }
+    break;
+
+    case RCORNER:
+        switch (ThisEvent.EventType) {
+            case ES_ENTRY:
+                turn_counter++;
+                CheckMoveToShooting();
+                TankLeft(650);
+                ES_Timer_InitTimer(TURN_TIMER, TURN_TIME);
+
+                break;
+            case ES_TIMEOUT:
+                if (ThisEvent.EventParam == TURN_TIMER) {
+                    nextState = CORRECTRIGHT;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+                break;
+
+            case ES_EXIT:
+                StopDriving();
+                break;
+
+            case ES_NO_EVENT:
+                break;
+        }
+        break;
+    case BUMPED_RIGHT:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    DriveBackward(650);
+                    ES_Timer_InitTimer(BACKUP_TIMER, BACKUP_TIMER_MS);
                     break;
 
-                case ES_NO_EVENT: 
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == BACKUP_TIMER) {
+                        TankLeft(650);
+                        ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                    }
+
+
+                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                        // StopDriving();
+                        nextState = CROSSING_RIGHT;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+            }
+            break;
+
+        case CROSSING_RIGHT:
+            switch (ThisEvent.EventType) {
+
+                case ES_ENTRY:
+                    printf("In CROSSING state\n");
+                    ignoreTape = TRUE;
+                    DriveForward(500);
+                    ES_Timer_InitTimer(CROSSING_TIMER, CROSSING_TIMER_MS);
+                    break;
+
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == CROSSING_TIMER) {
+                        // StopDriving();
+                        ignoreTape = FALSE;
+                        // TankRight(500);
+                        // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                    }
+
+                    // if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                    //     // StopDriving();
+
+                    //     nextState = CORRECTRIGHT;
+                    //     makeTransition = TRUE;
+                    //     ThisEvent.EventType = ES_NO_EVENT;
+                    // }
+                    // break;
+
+                case FRONT_TAPE_ON:
+                case FRONT_TAPE_OFF:
+                case LEFT_TAPE_ON:
+                case LEFT_TAPE_OFF:
+                case RIGHT_TAPE_ON:
+                case RIGHT_TAPE_OFF:
+                case REAR_TAPE_ON:
+                case REAR_TAPE_OFF:
+
+                    if (ignoreTape == TRUE) {
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else {
+                        // handle tape normally here
+                        if (ThisEvent.EventType == FRONT_TAPE_ON) {
+                            // nextState = FORWARD;
+                            // makeTransition = TRUE;
+                            // ThisEvent.EventType = ES_NO_EVENT;
+                            nextState = CROSSING_RIGHT2;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                        }
+                    }
+                    break;
+            }
+            break;
+
+        case CROSSING_RIGHT2:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    TankRight(650);
+                    ES_Timer_InitTimer(TANK_OBSTACLE, 750);
+                    break;
+
+                case ES_EXIT:
+                    StopDriving();
+                    break;
+
+                case ES_TIMEOUT:
+                    if (ThisEvent.EventParam == TANK_OBSTACLE) {
+                        // StopDriving();
+                        nextState = FORWARD;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+
+                    // case LEFT_TAPE_ON:
+                    //     nextState = CORRECTRIGHT;
+                    //     makeTransition = TRUE;
+                    //     ThisEvent.EventType = ES_NO_EVENT;
+                    //     break;
+
+                case ES_NO_EVENT:
+                default:
                     break;
             }
             break;
 
 
 
+    default:
+    break;
+} // end switch on Current State
 
-        default:
-            break;
-    } // end switch on Current State
+if (makeTransition == TRUE) {
+    RunLocateISZSubHSM(EXIT_EVENT);
+    PreviousState = CurrentState;
+    CurrentState = nextState;
+    RunLocateISZSubHSM(ENTRY_EVENT);
+}
 
-    if (makeTransition == TRUE) {
-        RunLocateISZSubHSM(EXIT_EVENT);
-        PreviousState = CurrentState;
-        CurrentState = nextState;
-        RunLocateISZSubHSM(ENTRY_EVENT);
-    }
-
-    ES_Tail(); // trace call stack end
-    return ThisEvent;
+ES_Tail(); // trace call stack end
+return ThisEvent;
 }
 
 

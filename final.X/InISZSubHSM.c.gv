@@ -32,7 +32,6 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR><TD ALIGN="LEFT">                count = 0;</TD></TR>
         <TR><TD ALIGN="LEFT">                ES_Timer_InitTimer(5, 5000);</TD></TR>
         <TR><TD ALIGN="LEFT">                ShootForward(speed);</TD></TR>
-        <TR><TD ALIGN="LEFT">                if (speed < 700) {</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
         </TR>
@@ -72,13 +71,13 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
 
     // guards
 
-    254 [shape=point, xlabel="            if ((ThisEvent.EventType == ES_TIMEOUT) && (ThisEvent.EventParam == 5)) {
+    257 [shape=point, xlabel="            if ((ThisEvent.EventType == ES_TIMEOUT) && (ThisEvent.EventParam == 5)) {
 "];
 
-    270 [shape=point, xlabel="                if (count > 10) {
+    273 [shape=point, xlabel="                if (count > 10) {
 "];
 
-    290 [shape=point, xlabel="                if (count > 5) {
+    293 [shape=point, xlabel="                if (count > 5) {
 "];
 
     // transitions
@@ -90,13 +89,11 @@ SpinningInISZ -> Charge1[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">BEACON_DETECTED</TD></TR>
         </TABLE>>];
 
-Charge1 -> 254[label=<<TABLE BORDER="0" CELLBORDER="0">
+Charge1 -> 257[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(5)</TD></TR>
             <TR><TD ALIGN="LEFT">                count = 0;</TD></TR>
             <TR><TD ALIGN="LEFT">                ShootForward(speed);</TD></TR>
-            <TR><TD ALIGN="LEFT">                if (speed < 700) {</TD></TR>
-            <TR><TD ALIGN="LEFT">                    speed += 50;</TD></TR>
-            <TR><TD ALIGN="LEFT">                }</TD></TR>
+            <TR><TD ALIGN="LEFT">                SpeedRamp();</TD></TR>
             <TR><TD ALIGN="LEFT">            }</TD></TR>
             <TR><TD ALIGN="LEFT">                ES_Event shootEvent;</TD></TR>
             <TR><TD ALIGN="LEFT">                shootEvent.EventType = SHOOT;</TD></TR>
@@ -105,35 +102,35 @@ Charge1 -> 254[label=<<TABLE BORDER="0" CELLBORDER="0">
             <TR><TD ALIGN="LEFT">            }</TD></TR>
         </TABLE>>];
 
-254 -> ShakeForward[label=<<TABLE BORDER="0" CELLBORDER="0">
+257 -> ShakeForward[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">TRUE</TD></TR>
         </TABLE>>];
 
-ShakeForward -> 270[label=<<TABLE BORDER="0" CELLBORDER="0">
+ShakeForward -> 273[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(8)</TD></TR>
             <TR><TD ALIGN="LEFT">                count++;</TD></TR>
         </TABLE>>];
 
-270 -> Charge1[label=<<TABLE BORDER="0" CELLBORDER="0">
+273 -> Charge1[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">TRUE</TD></TR>
             <TR><TD ALIGN="LEFT">                    count = 0;</TD></TR>
         </TABLE>>];
 
-270 -> ShakeBack[label=<<TABLE BORDER="0" CELLBORDER="0">
+273 -> ShakeBack[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">FALSE</TD></TR>
         </TABLE>>];
 
-ShakeBack -> 290[label=<<TABLE BORDER="0" CELLBORDER="0">
+ShakeBack -> 293[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(8)</TD></TR>
             <TR><TD ALIGN="LEFT">                count++;</TD></TR>
         </TABLE>>];
 
-290 -> Charge1[label=<<TABLE BORDER="0" CELLBORDER="0">
+293 -> Charge1[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">TRUE</TD></TR>
             <TR><TD ALIGN="LEFT">                    count = 0;</TD></TR>
         </TABLE>>];
 
-290 -> ShakeForward[label=<<TABLE BORDER="0" CELLBORDER="0">
+293 -> ShakeForward[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">FALSE</TD></TR>
         </TABLE>>];
 

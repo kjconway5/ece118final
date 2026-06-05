@@ -143,7 +143,7 @@ static const char *EventNames[] = {
 #define TIMER9_RESP_FUNC PostBotHSM
 #define TIMER10_RESP_FUNC PostBotHSM
 #define TIMER11_RESP_FUNC PostBotHSM
-#define TIMER12_RESP_FUNC TIMER_UNUSED
+#define TIMER12_RESP_FUNC PostBotHSM
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
 #define TIMER15_RESP_FUNC TIMER_UNUSED
@@ -157,9 +157,11 @@ static const char *EventNames[] = {
 
 #define GENERIC_NAMED_TIMER 0 /*make sure this is enabled above and posting to the correct state machine*/
 #define TURN_TIMER 4
+#define INITTIMER 6
 #define CROSSING_TIMER 7
 #define BACKUP_TIMER 10
 #define TANK_OBSTACLE 11
+#define BACKUP_TIMER1 12
 
 
 /****************************************************************************/

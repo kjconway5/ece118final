@@ -1,5 +1,23 @@
 Traceback (most recent call last):
-  File "/Users/kye/School/ECE118/ece118final/ECE118/ds30Wrapper/ece118/guiWidgets/SerialIO.py", line 73, in updateOutput
-    def updateOutput(self):
-    
-KeyboardInterrupt
+  File "/Users/kye/School/ECE118/ece118final/ECE118/ds30Wrapper/ece118/guiWidgets/ds30Loader.py", line 868, in _handleProcessFinished
+    self._cleanupAfterProcess()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/kye/School/ECE118/ece118final/ECE118/ds30Wrapper/ece118/guiWidgets/ds30Loader.py", line 902, in _cleanupAfterProcess
+    self.portInstance.Connect()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/kye/School/ECE118/ece118final/ECE118/ds30Wrapper/ece118/UsbSerial/__init__.py", line 84, in Connect
+    self.serialPort.open()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/kye/.espressif/python_env/idf5.5_py3.14_env/lib/python3.14/site-packages/serial/serialposix.py", line 332, in open
+    self._reconfigure_port(force_update=True)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/kye/.espressif/python_env/idf5.5_py3.14_env/lib/python3.14/site-packages/serial/serialposix.py", line 517, in _reconfigure_port
+    termios.tcsetattr(
+    ~~~~~~~~~~~~~~~~~^
+        self.fd,
+        ^^^^^^^^
+        termios.TCSANOW,
+        ^^^^^^^^^^^^^^^^
+        [iflag, oflag, cflag, lflag, ispeed, ospeed, cc])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+termios.error: (22, 'Invalid argument')

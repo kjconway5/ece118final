@@ -95,7 +95,11 @@ int speed = 500;
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/
-
+static void SpeedRamp(void) {
+    if (speed < 700) {
+        speed += 50;
+    }
+}
 /**
  * @Function InitTemplateSubHSM(uint8_t Priority)
  * @param Priority - internal variable to track which event queue to use
@@ -173,9 +177,7 @@ ES_Event RunInISZSubHSM(ES_Event ThisEvent) {
                 count = 0;
                 ES_Timer_InitTimer(SPINUP_TIMER, SPINUP_TIME_MS1);
                 ShootForward(speed);
-                if (speed < 700) {
-                    speed += 50;
-                }
+                SpeedRamp();
 
 
             }

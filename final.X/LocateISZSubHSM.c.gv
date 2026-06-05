@@ -56,6 +56,55 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
 </TABLE>>];
 
 
+    BUMPED_LEFT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">BUMPED_LEFT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    DriveBackward(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(10, 250);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    CROSSING_LEFT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CROSSING_LEFT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    printf("In CROSSING state\n");</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ignoreTape = TRUE;</TD></TR>
+        <TR><TD ALIGN="LEFT">                    DriveForward(500);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(7, 4000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    CROSSING_LEFT2 [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CROSSING_LEFT2</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TurnBackLeft(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(11, 600);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
     FORWARD_LEFT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
         <TR>
             <TD BORDER="1" SIDES="B">FORWARD_LEFT</TD>
@@ -63,11 +112,11 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
         </TR>
-        <TR><TD ALIGN="LEFT">                    TurnLeft(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">            TurnLeft(650);</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
         </TR>
-<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+<TR><TD ALIGN="LEFT">            StopDriving();</TD></TR>
 </TABLE>>];
 
 
@@ -78,11 +127,11 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
         </TR>
-        <TR><TD ALIGN="LEFT">                    TurnRight(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">            TurnRight(650);</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
         </TR>
-<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+<TR><TD ALIGN="LEFT">            StopDriving();</TD></TR>
 </TABLE>>];
 
 
@@ -93,10 +142,59 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
         </TR>
-        <TR><TD ALIGN="LEFT">                    turn_counter++;</TD></TR>
-        <TR><TD ALIGN="LEFT">                    CheckMoveToShooting();</TD></TR>
-        <TR><TD ALIGN="LEFT">                    TankLeft(650);</TD></TR>
-        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(4, 1000);</TD></TR>
+        <TR><TD ALIGN="LEFT">                turn_counter++;</TD></TR>
+        <TR><TD ALIGN="LEFT">                CheckMoveToShooting();</TD></TR>
+        <TR><TD ALIGN="LEFT">                TankLeft(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                ES_Timer_InitTimer(4, 1000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    BUMPED_RIGHT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">BUMPED_RIGHT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    DriveBackward(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(10, 250);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    StopDriving();</TD></TR>
+</TABLE>>];
+
+
+    CROSSING_RIGHT [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CROSSING_RIGHT</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    printf("In CROSSING state\n");</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ignoreTape = TRUE;</TD></TR>
+        <TR><TD ALIGN="LEFT">                    DriveForward(500);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(7, 4000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    CROSSING_RIGHT2 [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">CROSSING_RIGHT2</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    TankRight(650);</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ES_Timer_InitTimer(11, 750);</TD></TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Exit: </B></TD>
         </TR>
@@ -123,6 +221,10 @@ FORWARD -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
         </TABLE>>];
 
+FORWARD -> BUMPED_LEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_BUMPER_PRESSED or LEFT_BUMPER_PRESSED</TD></TR>
+        </TABLE>>];
+
 CORRECTLEFT -> FORWARD[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
         </TABLE>>];
@@ -135,36 +237,64 @@ CORRECTLEFT -> LCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
         </TABLE>>];
 
+CORRECTLEFT -> BUMPED_LEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_BUMPER_PRESSED or LEFT_BUMPER_PRESSED</TD></TR>
+        </TABLE>>];
+
 LCORNER -> CORRECTLEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(4)</TD></TR>
         </TABLE>>];
 
+BUMPED_LEFT -> CROSSING_LEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(11)</TD></TR>
+        </TABLE>>];
+
+CROSSING_LEFT -> CROSSING_LEFT2[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CROSSING_LEFT2 -> CORRECTRIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(11)</TD></TR>
+        </TABLE>>];
+
 FORWARD_LEFT -> CORRECTRIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_OFF</TD></TR>
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_OFF</TD></TR>
         </TABLE>>];
 
 FORWARD_LEFT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
         </TABLE>>];
 
-FORWARD_LEFT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+FORWARD_LEFT -> BUMPED_RIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_BUMPER_PRESSED or LEFT_BUMPER_PRESSED</TD></TR>
         </TABLE>>];
 
 CORRECTRIGHT -> FORWARD_LEFT[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
         </TABLE>>];
 
 CORRECTRIGHT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
         </TABLE>>];
 
-CORRECTRIGHT -> RCORNER[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+CORRECTRIGHT -> BUMPED_RIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_BUMPER_PRESSED or LEFT_BUMPER_PRESSED</TD></TR>
         </TABLE>>];
 
 RCORNER -> CORRECTRIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(4)</TD></TR>
+        </TABLE>>];
+
+BUMPED_RIGHT -> CROSSING_RIGHT[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(11)</TD></TR>
+        </TABLE>>];
+
+CROSSING_RIGHT -> CROSSING_RIGHT2[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
+        </TABLE>>];
+
+CROSSING_RIGHT2 -> FORWARD[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(11)</TD></TR>
         </TABLE>>];
 
 

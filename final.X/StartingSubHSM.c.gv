@@ -21,35 +21,23 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
 </TABLE>>];
 
 
+    MoveBackward [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">MoveBackward</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                ES_Timer_InitTimer(12, 1000);</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
     MoveForward [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
         <TR>
             <TD BORDER="1" SIDES="B">MoveForward</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    LeftTape [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">LeftTape</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    RightTape [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">RightTape</TD>
         </TR>
         <TR>
             <TD ALIGN="LEFT"><B>/Entry: </B></TD>
@@ -73,119 +61,34 @@ InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabe
 </TABLE>>];
 
 
-    Aligned2 [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">Aligned2</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    RightFirst [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">RightFirst</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    RightSecond [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">RightSecond</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    RightThird [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">RightThird</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
-    Aligned3 [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
-        <TR>
-            <TD BORDER="1" SIDES="B">Aligned3</TD>
-        </TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
-        </TR>
-        <TR><TD ALIGN="LEFT">                ES_Event moveEvent;</TD></TR>
-        <TR><TD ALIGN="LEFT">                moveEvent.EventType = MOVE_TO_LOCATE;</TD></TR>
-        <TR><TD ALIGN="LEFT">                moveEvent.EventParam = 0;</TD></TR>
-        <TR>
-            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
-        </TR>
-</TABLE>>];
-
-
     // guards
+
+    244 [shape=point, xlabel="            if (ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == 12) {
+"];
 
     // transitions
 InitPSubState -> Spinning[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(6)</TD></TR>
         </TABLE>>];
 
-Spinning -> MoveForward[label=<<TABLE BORDER="0" CELLBORDER="0">
+Spinning -> MoveBackward[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">BEACON_DETECTED</TD></TR>
         </TABLE>>];
 
-MoveForward -> LeftTape[label=<<TABLE BORDER="0" CELLBORDER="0">
+MoveBackward -> 244[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(12)</TD></TR>
+            <TR><TD ALIGN="LEFT">                DriveBackward(500);</TD></TR>
+            <TR><TD ALIGN="LEFT">            }</TD></TR>
+            <TR><TD ALIGN="LEFT">                StopDriving();</TD></TR>
+            <TR><TD ALIGN="LEFT">            }</TD></TR>
+        </TABLE>>];
+
+244 -> MoveForward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">TRUE</TD></TR>
+        </TABLE>>];
+
+MoveForward -> Aligned[label=<<TABLE BORDER="0" CELLBORDER="0">
         <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-MoveForward -> RightFirst[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-LeftTape -> RightTape[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-RightTape -> Aligned[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-Aligned -> Aligned2[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">REAR_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-Aligned2 -> Aligned3[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-RightFirst -> RightTape[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-RightSecond -> RightTape[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">FRONT_TAPE_ON</TD></TR>
-        </TABLE>>];
-
-RightThird -> Aligned2[label=<<TABLE BORDER="0" CELLBORDER="0">
-        <TR><TD BORDER="1" SIDES="B">REAR_TAPE_ON</TD></TR>
         </TABLE>>];
 
 
