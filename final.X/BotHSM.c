@@ -145,7 +145,7 @@ ES_Event RunBotHSM(ES_Event ThisEvent) {
                 // initial state
                 // Initialize all sub-state machines
                 InitStartingSubHSM();
-                //InitInISZSubHSM();
+                // InitInISZSubHSM();
                 // InitLocateISZSubHSM();
                 // now put the machine into the actual initial state
                 nextState = Starting;

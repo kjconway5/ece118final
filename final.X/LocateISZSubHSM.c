@@ -73,16 +73,16 @@ static const char *StateNames[] = {
 
 
 #define TURN_TIMER 4
-#define TURN_TIME 1000
+#define TURN_TIME 1250
 
 #define CROSSING_TIMER     7
-#define CROSSING_TIMER_MS  4000
+#define CROSSING_TIMER_MS  2500
 
 #define BACKUP_TIMER 10
 #define BACKUP_TIMER_MS 250
 
 #define TANK_OBSTACLE 11
-#define TANK_OBSTACLE_MS 930
+#define TANK_OBSTACLE_MS 1000
 
 static uint8_t ignoreTape = FALSE;
 
@@ -308,7 +308,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("In CROSSING state\n");
                     ignoreTape = TRUE;
-                    DriveForward(500);
+                    DriveForward(650);
                     ES_Timer_InitTimer(CROSSING_TIMER, CROSSING_TIMER_MS);
                     break;
 
@@ -316,7 +316,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     if (ThisEvent.EventParam == CROSSING_TIMER) {
                         // StopDriving();
                         ignoreTape = FALSE;
-                        // TankRight(500);
+                        // TankRight(650);
                         // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
                     }
 
@@ -360,7 +360,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     TankLeft(650);
-                    ES_Timer_InitTimer(TANK_OBSTACLE, 600);
+                    ES_Timer_InitTimer(TANK_OBSTACLE, 500);
                     break;
 
                 case ES_EXIT:
@@ -496,7 +496,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     DriveBackward(650);
-                    ES_Timer_InitTimer(BACKUP_TIMER, BACKUP_TIMER_MS);
+                    ES_Timer_InitTimer(BACKUP_TIMER, 750);
                     break;
 
                 case ES_EXIT:
@@ -506,7 +506,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 case ES_TIMEOUT:
                     if (ThisEvent.EventParam == BACKUP_TIMER) {
                         TankLeft(650);
-                        ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
+                        ES_Timer_InitTimer(TANK_OBSTACLE, 800);
                     }
 
 
@@ -526,7 +526,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("In CROSSING state\n");
                     ignoreTape = TRUE;
-                    DriveForward(500);
+                    DriveForward(650);
                     ES_Timer_InitTimer(CROSSING_TIMER, CROSSING_TIMER_MS);
                     break;
 
@@ -534,7 +534,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
                     if (ThisEvent.EventParam == CROSSING_TIMER) {
                         // StopDriving();
                         ignoreTape = FALSE;
-                        // TankRight(500);
+                        // TankRight(650);
                         // ES_Timer_InitTimer(TANK_OBSTACLE, TANK_OBSTACLE_MS);
                     }
 
@@ -578,7 +578,7 @@ ES_Event RunLocateISZSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     TankRight(650);
-                    ES_Timer_InitTimer(TANK_OBSTACLE, 750);
+                    ES_Timer_InitTimer(TANK_OBSTACLE, 600);
                     break;
 
                 case ES_EXIT:

@@ -78,7 +78,7 @@ static uint8_t MyPriority;
 #define BACKUP_TIMER1 12
 #define TANK_TIMER2 13
 #define BACKUP_TIME 1000
-#define TANK_TIME2 3000
+#define TANK_TIME2 3750
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
  ******************************************************************************/

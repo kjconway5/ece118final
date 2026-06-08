@@ -125,7 +125,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST BumperEventChecker, TapeEventChecker, BeaconEventChecker, TrackwireEventChecker
+#define EVENT_CHECK_LIST  TapeEventChecker, BumperEventChecker, BeaconEventChecker, TrackwireEventChecker
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
 // corresponding timer expires. All 16 must be defined. If you are not using
